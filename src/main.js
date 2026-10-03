@@ -1,8 +1,9 @@
 /**
- * Boots the app and picks the view:
- *   ?rerun in the URL -> rerunView
- *   off air           -> offAirView
- *   on air / sign-off -> liveView
+ * Boots the app: mounts the shell, then picks what plays on the screen and what
+ * the guide shows.
+ *   ?rerun in the URL -> rerunView + tape rack
+ *   off air           -> offAirView + tape rack
+ *   on air / sign-off -> liveView + TONIGHT'S LISTINGS
  *
  * Gotchas
  *   - While a tape is in the deck, real clock changes are ignored.
@@ -14,34 +15,41 @@ import {
   scheduleNextBoundary,
   state,
 } from './broadcastClock.js';
+import { renderGuide } from './guide.js';
 import { renderLive } from './liveView.js';
 import { renderOffAir } from './offAirView.js';
-import { parseRerun } from './rerun.js';
+import { listings, parseRerun } from './rerun.js';
 import { renderRerun } from './rerunView.js';
+import { mountShell } from './shell.js';
+import './screen.css';
 
-const stage = document.getElementById('stage');
+const shell = mountShell(document.getElementById('app'));
 let rerunCh = parseRerun(location.search);
 let teardown = () => {};
 
 function show({ focus = false } = {}) {
   teardown();
-  stage.replaceChildren();
+  shell.screen.replaceChildren();
   const now = new Date();
-  if (rerunCh) {
-    teardown = renderRerun(stage, {
-      ch: rerunCh,
-      onPlay: play,
-      onEject: eject,
-    });
-  } else if (state(now) === 'off-air') {
-    teardown = renderOffAir(stage, { onPlay: play });
+  const real = state(now);
+  const listing = currentListing(now);
+  const mode = rerunCh ? 'rerun' : real === 'off-air' ? 'off' : 'live';
+
+  shell.setMode(mode);
+  if (mode === 'rerun') {
+    teardown = renderRerun(shell.screen, { ch: rerunCh, onEject: eject });
+    shell.led.set(rerunCh, listings.find((l) => l.ch === rerunCh).title);
+  } else if (mode === 'off') {
+    teardown = renderOffAir(shell.screen, { onPlay: play });
+    shell.led.set(null);
   } else {
-    teardown = renderLive(stage, {
-      state: state(now),
-      listing: currentListing(now),
-    });
+    teardown = renderLive(shell.screen, { state: real, listing });
+    shell.led.set(listing.ch, listing.title);
   }
-  if (focus) stage.querySelector('[data-focus]')?.focus();
+  shell.guide.replaceChildren(
+    renderGuide({ mode, listing, playingCh: rerunCh, onPlay: play }),
+  );
+  if (focus) shell.screen.querySelector('[data-focus]')?.focus();
 }
 
 function setRerun(ch) {

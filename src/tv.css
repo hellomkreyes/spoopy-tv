@@ -1,0 +1,186 @@
+/* The set: bezel, CRT screen with overlays, control panel and LED. */
+.tv-bezel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px;
+  background: linear-gradient(180deg, #44242f 0%, var(--bezel-dark) 100%);
+  border-radius: 28px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+.crt {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  /* clip (not hidden) so the 4:3 box can grow to fit its content instead of cropping it. */
+  overflow: clip;
+  background: var(--screen);
+  border-radius: 22px / 26px;
+  box-shadow:
+    inset 0 0 0 4px #120b10,
+    inset 0 0 40px rgba(0, 0, 0, 0.9);
+}
+
+.crt-content {
+  position: relative;
+  min-height: 100%;
+}
+
+/* Scanlines and vignette are plain CSS gradients: no per-frame cost. */
+.crt-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.18) 0 1px,
+      transparent 1px 3px
+    ),
+    radial-gradient(
+      120% 110% at 50% 50%,
+      transparent 55%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+  gap: 10px;
+  align-items: stretch;
+}
+
+.led {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 4px 8px;
+  background: #140808;
+  border: 2px solid #2b1414;
+  border-radius: 12px;
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.9);
+}
+
+.led-label {
+  display: none;
+  font-family: var(--label);
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  color: var(--coral);
+}
+
+.led-digits {
+  font-family: var(--label);
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--coral);
+  text-shadow: 0 0 10px rgba(255, 122, 102, 0.6);
+}
+
+.ctl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px;
+  background: #2a1520;
+  border: 2px solid #4a2a38;
+  border-radius: 12px;
+  font-family: var(--label);
+  letter-spacing: 0.12em;
+  color: var(--ink);
+}
+
+.ctl:disabled {
+  color: #9b8fb0;
+  border-color: #3a2230;
+}
+
+.ctl-text {
+  display: none;
+}
+
+.ctl svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ctl .fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.grille {
+  display: none;
+}
+
+/* The mobile mock has its own short caption. */
+.cap-wide {
+  display: none;
+}
+
+.tv-caption {
+  margin: 12px 0 0;
+  font-family: var(--label);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+  color: var(--muted);
+}
+
+@media (min-width: 640px) {
+  .cap-wide {
+    display: inline;
+  }
+
+  .cap-narrow {
+    display: none;
+  }
+
+  .tv-bezel {
+    grid-template-columns: minmax(0, 1fr) 132px;
+    gap: 20px;
+    padding: 28px;
+    border-radius: 36px;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+
+  .led {
+    min-height: 96px;
+  }
+
+  .led-label {
+    display: block;
+  }
+
+  .led-digits {
+    font-size: 3.4rem;
+  }
+
+  .ctl-text {
+    display: inline;
+  }
+
+  .grille {
+    display: block;
+    height: 180px;
+    border-radius: 8px;
+    background: repeating-linear-gradient(0deg, #1b0e15 0 3px, #33202a 3px 6px);
+  }
+}

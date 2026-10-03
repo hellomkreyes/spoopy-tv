@@ -1,3 +1,5 @@
+@import './fonts/fonts.css';
+
 :root {
   color-scheme: dark;
   --bg: #0c0914;
@@ -9,9 +11,16 @@
   --magenta: #e22bb8;
   --row-hot: #2a1237;
   --line: #2b2338;
-  /* Fonts get self-hosted in the TV shell PR; system stacks until then. */
-  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --bezel: #3a1f2b;
+  --bezel-dark: #2a1520;
+  --paper: #ede5d8;
+  --paper-ink: #1a1220;
+
+  /* Dela Gothic One: display. DotGothic16: labels and LED. Zen Kaku Gothic New: reading text. */
+  --display: 'Dela Gothic One', 'Zen Kaku Gothic New', system-ui, sans-serif;
+  --label: 'DotGothic16', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --body:
+    'Zen Kaku Gothic New', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 * {
@@ -20,30 +29,25 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: radial-gradient(120% 60% at 50% 0%, #1b1030 0%, var(--bg) 60%);
+  background-color: var(--bg);
   color: var(--ink);
-  font-family: var(--sans);
+  font-family: var(--body);
   line-height: 1.5;
-}
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 24px 16px 48px;
-}
-
-h1 {
-  margin: 0 0 24px;
-  font-size: 1.75rem;
-  text-shadow:
-    2px 0 var(--magenta),
-    -2px 0 #3cc8ff;
 }
 
 button {
   font: inherit;
   color: inherit;
   cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+a {
+  color: inherit;
 }
 
 :focus-visible {
@@ -63,277 +67,191 @@ button {
   border: 0;
 }
 
-.tv-grid {
-  display: grid;
-  gap: 24px;
-}
-
-@media (min-width: 900px) {
-  .tv-grid {
-    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-    align-items: start;
-  }
-}
-
-/* Screen: test card, rerun and live placeholder share the CRT panel. */
-.screen {
-  position: relative;
-  min-height: 420px;
-  padding: 0 16px 24px;
-  background: var(--screen);
-  border: 8px solid #3a1f2b;
-  border-radius: 28px;
-  text-align: center;
-  overflow: hidden;
-}
-
-.screen-title {
-  margin: 24px 0 8px;
-  font-family: var(--mono);
-  font-size: clamp(2rem, 6vw, 3.25rem);
-  letter-spacing: 0.02em;
-  text-shadow:
-    2px 0 var(--magenta),
-    -2px 0 #3cc8ff;
-}
-
-.screen-title:focus {
-  outline: none;
-}
-
-.screen-sub {
-  margin: 0 0 8px;
-  font-family: var(--mono);
-  color: var(--green);
-  letter-spacing: 0.12em;
-}
-
-.screen-count {
-  margin: 8px 0 24px;
-  font-family: var(--mono);
-  font-size: 1.5rem;
-  letter-spacing: 0.1em;
-}
-
-.bars {
-  display: flex;
-  height: 56px;
-  margin: 0 -16px;
-}
-
-.bars span {
-  flex: 1;
-}
-.bars span:nth-child(1) {
-  background: #8a8a8a;
-}
-.bars span:nth-child(2) {
-  background: #a9a331;
-}
-.bars span:nth-child(3) {
-  background: #2fa8b3;
-}
-.bars span:nth-child(4) {
-  background: #3fb35a;
-}
-.bars span:nth-child(5) {
-  background: #b53fb0;
-}
-.bars span:nth-child(6) {
-  background: #a8372f;
-}
-.bars span:nth-child(7) {
-  background: #2b3a9c;
-}
-
-/* The haunted tape: a real button drawn as a VHS cassette. */
-.tape {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: none;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  font-family: var(--mono);
-  letter-spacing: 0.12em;
-}
-
-.tape:hover {
-  border-color: var(--magenta);
-}
-
-.tape-art {
-  display: block;
-  width: 190px;
-  padding: 8px;
-  background: #1a1220;
-  border: 1px solid #3a2f48;
-  border-radius: 8px;
-}
-
-.tape-label {
-  display: block;
-  padding: 6px 4px;
-  background: #e9e3d6;
-  color: #1a1220;
-  font-family: Georgia, serif;
-  transform: rotate(-1deg);
-}
-
-.tape-label-title {
-  display: block;
-  font-size: 1.1rem;
-}
-
-.tape-label-rec {
-  display: block;
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-}
-
-.tape-reels {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  margin-top: 10px;
-  padding: 6px;
-  background: #0c0914;
-  border-radius: 16px;
-}
-
-.reel {
-  width: 20px;
-  height: 20px;
-  border: 5px solid #cfc9d8;
-  border-radius: 50%;
-  background: #0c0914;
-}
-
-.tape-text {
-  max-width: 280px;
-  font-size: 0.85rem;
-}
-
-/* Rerun placeholder */
-.rerun-top {
-  display: flex;
-  justify-content: space-between;
-  padding: 16px 0 0;
-  font-family: var(--mono);
-  letter-spacing: 0.1em;
-}
-
-.rerun-bug {
-  color: var(--coral);
-}
-
-.eject {
-  margin-top: 24px;
-  padding: 10px 18px;
-  background: none;
-  border: 1px solid var(--muted);
-  border-radius: 8px;
-  font-family: var(--mono);
-  letter-spacing: 0.1em;
-}
-
-.eject:hover {
-  border-color: var(--magenta);
-}
-
-/* Tracking wobble on tape entry: a few small position steps, no brightness change. */
-.is-tuning > * {
-  animation: tracking 600ms steps(3) 1;
-}
-
-@keyframes tracking {
-  0% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-6px);
-  }
-  60% {
-    transform: translateX(4px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
 .is-paused * {
   animation-play-state: paused !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .is-tuning > * {
-    animation: none;
-  }
+/* Page frame */
+.site-header,
+.site-main,
+.site-footer {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
-/* Tape rack */
-.rack-heading {
-  margin: 0 0 8px;
-  font-family: var(--mono);
-  font-size: 1.5rem;
-  letter-spacing: 0.2em;
-  color: var(--green);
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
-.rack-intro {
-  margin: 0 0 16px;
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.wordmark {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.1;
+  color: #fff;
+  text-shadow:
+    1.5px 0 var(--magenta),
+    -1.5px 0 #3cc8ff;
+}
+
+.domain {
+  font-family: var(--label);
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
   color: var(--muted);
 }
 
-.rack-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--line);
+.domain-name {
+  display: none;
 }
 
-.rack-row {
-  border-bottom: 1px solid var(--line);
+.site-nav {
+  display: flex;
+  gap: 28px;
+  font-family: var(--label);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
 }
 
-.rack-item {
+.site-nav a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* On mobile only TV GUIDE shows, as a bordered button (per the mobile mock). */
+.site-nav a:not(:first-child) {
+  display: none;
+}
+
+.site-nav a:first-child {
+  padding: 12px 18px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  text-decoration: none;
+}
+
+.layout {
   display: grid;
-  grid-template-columns: 1.5rem 3.5rem 4rem 1fr;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 12px 8px;
-  background: none;
-  border: 0;
-  border-left: 3px solid transparent;
-  text-align: left;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.rack-item:hover,
-.rack-item[aria-current='true'] {
-  background: var(--row-hot);
-  border-left-color: var(--magenta);
+.layout[data-mode='live'] {
+  grid-template-areas: 'tv' 'def' 'guide';
 }
 
-.rack-play {
-  color: var(--magenta);
+.layout[data-mode='off'],
+.layout[data-mode='rerun'] {
+  grid-template-areas: 'tv' 'guide' 'def';
 }
 
-.rack-time,
-.rack-ch {
-  font-family: var(--mono);
+.slot-tv {
+  grid-area: tv;
+}
+.slot-def {
+  grid-area: def;
+}
+.slot-guide {
+  grid-area: guide;
 }
 
-.rack-ch {
-  color: var(--coral);
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  font-family: var(--label);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
 }
 
-.rack-badge {
-  color: var(--green);
-  font-family: var(--mono);
-  font-size: 0.85em;
-  letter-spacing: 0.08em;
+.footer-extra {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .domain-name {
+    display: inline;
+  }
+
+  .site-header {
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  .brand {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 16px;
+  }
+
+  .wordmark {
+    font-size: 2.4rem;
+  }
+
+  .site-nav a:not(:first-child) {
+    display: inline;
+  }
+
+  .site-nav a:first-child {
+    padding: 0;
+    border: 0;
+    background: none;
+    text-decoration: underline;
+  }
+
+  .footer-extra {
+    display: inline;
+  }
+}
+
+@media (min-width: 1000px) {
+  .site-header,
+  .site-main,
+  .site-footer {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+
+  .layout {
+    gap: 24px 40px;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+  }
+
+  .layout[data-mode='live'] {
+    grid-template-areas:
+      'tv def'
+      'tv guide';
+  }
+
+  .layout[data-mode='off'],
+  .layout[data-mode='rerun'] {
+    grid-template-areas:
+      'tv guide'
+      'def .';
+  }
+
+  .slot-def {
+    max-width: 360px;
+  }
 }

@@ -1,5 +1,5 @@
 /**
- * The OFF AIR test card (countdown, Haunted Tape button) beside the tape rack.
+ * The OFF AIR test card (countdown, Haunted Tape button).
  *
  * Functions
  *   renderOffAir(stage, { onPlay })  draws into `stage`; returns a teardown function
@@ -10,12 +10,10 @@ import { msUntilMidnight } from './broadcastClock.js';
 import { el } from './dom.js';
 import { countdown, fill, to12h } from './format.js';
 import copy from './offAir.json';
-import { renderRack } from './rack.js';
 import { rerunClock, rerunDefault } from './rerun.js';
 
 const BAR_COUNT = 7;
 
-/** Off-air test card + tape rack. Returns a teardown function. */
 export function renderOffAir(stage, { onPlay }) {
   const time = to12h(rerunClock);
   const counter = el(
@@ -48,7 +46,7 @@ export function renderOffAir(stage, { onPlay }) {
 
   const screen = el(
     'section',
-    { class: 'screen test-card', 'aria-labelledby': 'off-air-title' },
+    { class: 'view test-card', 'aria-labelledby': 'off-air-title' },
     el(
       'div',
       { class: 'bars', 'aria-hidden': 'true' },
@@ -58,7 +56,7 @@ export function renderOffAir(stage, { onPlay }) {
       'h2',
       {
         id: 'off-air-title',
-        class: 'screen-title',
+        class: 'view-title',
         tabindex: '-1',
         'data-focus': '',
       },
@@ -66,16 +64,16 @@ export function renderOffAir(stage, { onPlay }) {
     ),
     el(
       'p',
-      { class: 'screen-sub' },
+      { class: 'view-sub' },
       el('span', { lang: 'ja' }, copy.titleJa),
       ` · ${copy.tagline}`,
     ),
-    el('p', { class: 'screen-count' }, `${copy.resumes} `, counter),
+    el('p', { class: 'view-count' }, `${copy.resumes} `, counter),
     el('p', { class: 'sr-only' }, copy.resumesText),
     tape,
   );
 
-  stage.append(el('div', { class: 'tv-grid' }, screen, renderRack({ onPlay })));
+  stage.append(screen);
 
   const timer = setInterval(() => {
     counter.textContent = countdown(msUntilMidnight(new Date()));
