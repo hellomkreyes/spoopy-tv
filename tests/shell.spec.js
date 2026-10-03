@@ -48,6 +48,16 @@ for (const size of SIZES) {
       });
     }
 
+    test('TV GUIDE and CHIBIMUERE.COM are both visible in the header', async ({
+      page,
+    }) => {
+      await visit(page, '12:00');
+      await expect(page.getByRole('link', { name: 'TV GUIDE' })).toBeVisible();
+      await expect(
+        page.getByRole('link', { name: /CHIBIMUERE\.COM/ }),
+      ).toBeVisible();
+    });
+
     test('the Haunted Tape button sits fully inside the screen', async ({
       page,
     }) => {

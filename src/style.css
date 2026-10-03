@@ -100,13 +100,14 @@ a {
 .wordmark {
   margin: 0;
   font-family: var(--display);
-  font-size: 2rem;
+  font-size: 2.125rem;
   font-weight: 400;
   line-height: 1.1;
-  color: #fff;
+  letter-spacing: 0.04em;
+  color: var(--ink);
   text-shadow:
-    1.5px 0 var(--magenta),
-    -1.5px 0 #3cc8ff;
+    2px 0 var(--magenta),
+    -2px 0 #3cc8ff;
 }
 
 .domain {
@@ -122,7 +123,9 @@ a {
 
 .site-nav {
   display: flex;
-  gap: 28px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
   font-family: var(--label);
   font-size: 0.9rem;
   letter-spacing: 0.12em;
@@ -133,11 +136,7 @@ a {
   text-underline-offset: 4px;
 }
 
-/* On mobile only TV GUIDE shows, as a bordered button (per the mobile mock). */
-.site-nav a:not(:first-child) {
-  display: none;
-}
-
+/* On mobile TV GUIDE is a bordered button (per the mobile mock); CHIBIMUERE.COM sits under it. */
 .site-nav a:first-child {
   padding: 12px 18px;
   border: 2px solid var(--line);
@@ -204,12 +203,10 @@ a {
     gap: 16px;
   }
 
-  .wordmark {
-    font-size: 2.4rem;
-  }
-
-  .site-nav a:not(:first-child) {
-    display: inline;
+  .site-nav {
+    flex-direction: row;
+    align-items: center;
+    gap: 28px;
   }
 
   .site-nav a:first-child {
