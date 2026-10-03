@@ -1,0 +1,7 @@
+.DS_Store
+node_modules
+dist
+playwright-report
+test-results
+.textlint-cache
+build/
