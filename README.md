@@ -2,7 +2,7 @@
 
 A vibe-paired-programmed haunted CRT channel at [tv.chibimuere.com](https://tv.chibimuere.com). 
 
-<img width="960" height="720" alt="ch03-emergency" src="https://github.com/user-attachments/assets/8b4a9ab5-e284-44e6-80ea-74400973e2a3" />
+<img width="750" alt="a preview of Kaidenpa's channel 003: emergency broadcast." src="https://github.com/user-attachments/assets/8b4a9ab5-e284-44e6-80ea-74400973e2a3" />
 
 Together, CC and I built another liminal space in the internet. This time, the space can only be accessed in the early hours of the day. Lots of CRT influences to tickle your fancy! There are no seizure inducing flashing lights; I guarantee this is a11y & spoopy. 👻
 
