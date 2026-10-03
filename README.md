@@ -1,10 +1,14 @@
 # 怪電波 Kaidenpa
 
-A haunted CRT you channel-flip, at [tv.chibimuere.com](https://tv.chibimuere.com).
+A vibe-paired-programmed haunted CRT channel at [tv.chibimuere.com](https://tv.chibimuere.com). 
 
-No seizure inducing flashing lights; I guarantee this is a11y & spoopy. 👻
+<img width="960" height="720" alt="ch03-emergency" src="https://github.com/user-attachments/assets/8b4a9ab5-e284-44e6-80ea-74400973e2a3" />
 
-It's on air from 00:00 to 04:44 on your device's clock (04:44 is the mirror hour) and goes off air the rest of the day. Visitors who arrive when Kaidenpa is off air can still watch a rerun from the tape rack. The visual and ambient inspiration of *Kaidenpa* comes from: The Ring, Durarara!!, Jigoku Shoujo, and DanDaDan.
+Together, CC and I built another liminal space in the internet. This time, the space can only be accessed in the early hours of the day. Lots of CRT influences to tickle your fancy! There are no seizure inducing flashing lights; I guarantee this is a11y & spoopy. 👻
+
+#### The visual and ambient inspiration of *Kaidenpa* comes from: The Ring, Durarara!!, Jigoku Shoujo, and DanDaDan.
+
+It's on air from 00:00 to 04:44 on your device's clock (04:44 is the mirror hour) and goes off air the rest of the day. Visitors who arrive when Kaidenpa is off air can still watch a rerun from the tape rack. 
 
 **Status:** 🚧 Under construction. 🚧 The scaffold is in place; the broadcast clock, TV shell and channels are landing PR by PR.
 
