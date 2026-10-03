@@ -17,18 +17,18 @@ export function renderLive(stage, { state, listing }) {
   stage.append(
     el(
       'section',
-      { class: 'screen live', 'aria-labelledby': 'live-title' },
+      { class: 'view live', 'aria-labelledby': 'live-title' },
       el(
         'h2',
         {
           id: 'live-title',
-          class: 'screen-title',
+          class: 'view-title',
           tabindex: '-1',
           'data-focus': '',
         },
         [label, channel, listing.title].filter(Boolean).join(' · '),
       ),
-      el('p', { class: 'screen-sub' }, copy.live.placeholder),
+      el('p', { class: 'view-sub' }, copy.live.placeholder),
     ),
   );
   return () => {};

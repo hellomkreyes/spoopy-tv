@@ -1,0 +1,105 @@
+.guide-heading {
+  margin: 0 0 8px;
+  font-family: var(--label);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  color: var(--green);
+}
+
+.guide-intro {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.guide-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.guide-row {
+  display: grid;
+  grid-template-columns: 3.5rem 4.25rem 1fr;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--line);
+  border-left: 3px solid transparent;
+}
+
+.guide-row[aria-current='true'] {
+  background: var(--row-hot);
+  border-left-color: var(--magenta);
+}
+
+.guide-row-tape {
+  display: block;
+  padding: 0;
+  border-left: 0;
+}
+
+.guide-row-tape:has([aria-current='true']) {
+  background: var(--row-hot);
+  border-left: 3px solid var(--magenta);
+}
+
+.guide-item {
+  display: grid;
+  grid-template-columns: 1.5rem 3.5rem 4.25rem 1fr;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 8px;
+  background: none;
+  border: 0;
+  text-align: left;
+}
+
+.guide-item:hover {
+  background: var(--row-hot);
+}
+
+.guide-play {
+  color: var(--magenta);
+}
+
+.guide-time,
+.guide-ch {
+  font-family: var(--label);
+  letter-spacing: 0.05em;
+}
+
+.guide-ch {
+  color: var(--coral);
+}
+
+.guide-badge {
+  white-space: nowrap;
+  color: var(--green);
+  font-family: var(--label);
+  font-size: 0.85em;
+  letter-spacing: 0.08em;
+}
+
+.guide-row[aria-current='true'] .guide-badge {
+  color: #ff8be6;
+}
+
+.guide-lost {
+  color: var(--muted);
+}
+
+.guide-lost .guide-ch {
+  color: var(--muted);
+}
+
+.guide-static {
+  display: inline-block;
+  width: 36px;
+  height: 14px;
+  margin-right: 8px;
+  vertical-align: -2px;
+  background: repeating-linear-gradient(90deg, #6d647c 0 2px, #3a3347 2px 4px);
+}

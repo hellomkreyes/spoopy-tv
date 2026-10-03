@@ -28,7 +28,7 @@ test.describe('off air', () => {
     await expect(
       page.getByRole('button', { name: /PLAY THE HAUNTED TAPE · 04:20 AM/ }),
     ).toBeVisible();
-    await expect(page.locator('.rack-item')).toHaveCount(7);
+    await expect(page.locator('.guide-item')).toHaveCount(7);
     expect(errors).toEqual([]);
   });
 
@@ -84,9 +84,9 @@ test.describe('haunted tape', () => {
     await expect(page.locator('.rerun-bug')).toHaveText('● RERUN');
     await expect(page.locator('.rerun-clock')).toHaveText('04:20 AM');
     await expect(page).toHaveURL(/\?rerun=09$/);
-    await expect(page.locator('.rack-item[aria-current="true"]')).toContainText(
-      'Sky Watch',
-    );
+    await expect(
+      page.locator('.guide-item[aria-current="true"]'),
+    ).toContainText('Sky Watch');
   });
 
   test('plain ?rerun works at any hour, even on air', async ({ page }) => {
@@ -111,11 +111,11 @@ test.describe('haunted tape', () => {
     page,
   }) => {
     await visit(page, '12:00');
-    await page.locator('.rack-item[data-ch="03"]').click();
+    await page.locator('.guide-item[data-ch="03"]').click();
     await expect(
       page.getByRole('heading', { name: 'CH 03 · Emergency Alert' }),
     ).toBeVisible();
-    await page.locator('.rack-item[data-ch="so"]').click();
+    await page.locator('.guide-item[data-ch="so"]').click();
     await expect(page).toHaveURL(/\?rerun=so$/);
   });
 
