@@ -12,6 +12,8 @@ const CSP = [
 ].join('; ');
 
 export default defineConfig({
+  // Never inline assets as data: URIs; the CSP only allows 'self' for fonts.
+  build: { assetsInlineLimit: 0 },
   plugins: [
     {
       name: 'csp-meta',

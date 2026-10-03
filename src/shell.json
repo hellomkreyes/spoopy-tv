@@ -1,0 +1,76 @@
+{
+  "wordmark": "怪電波",
+  "wordmarkSr": "Kaidenpa",
+  "brandName": "KAIDENPA",
+  "domain": "TV.CHIBIMUERE.COM",
+  "nav": [
+    { "label": "TV GUIDE", "href": "#listings" },
+    {
+      "label": "CHIBIMUERE.COM ↗",
+      "href": "https://chibimuere.com",
+      "external": true
+    }
+  ],
+  "tv": {
+    "label": "Television",
+    "ledLabel": "CHANNEL",
+    "chUp": "CH",
+    "chUpSr": "Channel up",
+    "chDown": "CH",
+    "chDownSr": "Channel down",
+    "motion": "MOTION",
+    "power": "POWER"
+  },
+  "led": {
+    "off": "Off air",
+    "channel": "Channel {ch}: {title}",
+    "signOff": "Sign-off: {title}"
+  },
+  "captions": {
+    "live": "↑ ↓ or 0–9 to change channels · swipe on mobile · SPACE pauses all motion · every channel has a still frame",
+    "off": "off air · the tape rack on the right plays recorded reruns · clock frozen at 04:20 while a tape is playing"
+  },
+  "definition": {
+    "label": "定義 · DEFINITION",
+    "term": "怪電波",
+    "reading": "かいでんぱ",
+    "romaji": "kai·den·pa",
+    "pos": "noun",
+    "senses": [
+      {
+        "parts": [
+          ["t", "Strange radio waves of unknown origin. From "],
+          ["ja", "怪"],
+          ["t", " "],
+          ["em", "kai"],
+          ["t", ", “eerie, mysterious” + "],
+          ["ja", "電波"],
+          ["t", " "],
+          ["em", "denpa"],
+          ["t", ", “radio waves.”"]
+        ]
+      },
+      {
+        "parts": [
+          ["em", "slang."],
+          [
+            "t",
+            " Off-the-wall talk that sounds like it’s being picked up from somewhere else."
+          ]
+        ]
+      }
+    ]
+  },
+  "guide": {
+    "title": "TONIGHT’S LISTINGS",
+    "onAir": "ON AIR",
+    "signOffLabel": "SIGN-OFF",
+    "signalLostCh": "CH 00",
+    "signalLost": "signal lost"
+  },
+  "footer": {
+    "left": "A CHIBI MUERE TRANSMISSION",
+    "leftExtra": "BROADCASTING FROM TORONTO AFTER MIDNIGHT",
+    "right": "MADE WITH GSAP · NO COOKIES · NO GHOSTS HARMED"
+  }
+}
