@@ -4,7 +4,10 @@
   "brandName": "KAIDENPA",
   "domain": "TV.CHIBIMUERE.COM",
   "nav": [
-    { "label": "TV GUIDE", "href": "#listings" },
+    {
+      "label": "TV GUIDE",
+      "href": "#listings"
+    },
     {
       "label": "CHIBIMUERE.COM ↗",
       "href": "https://chibimuere.com",
@@ -28,10 +31,11 @@
   },
   "captions": {
     "live": "↑ ↓ or 0–9 to change channels · swipe on mobile · SPACE pauses all motion · every channel has a still frame",
+    "liveNarrow": "swipe the screen to change channels",
     "off": "off air · the tape rack on the right plays recorded reruns · clock frozen at 04:20 while a tape is playing"
   },
   "definition": {
-    "label": "定義 · DEFINITION",
+    "label": "DEFINITION",
     "term": "怪電波",
     "reading": "かいでんぱ",
     "romaji": "kai·den·pa",
@@ -59,7 +63,8 @@
           ]
         ]
       }
-    ]
+    ],
+    "labelJa": "定義"
   },
   "guide": {
     "title": "TONIGHT’S LISTINGS",
