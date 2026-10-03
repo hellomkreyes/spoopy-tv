@@ -37,5 +37,9 @@ A haunted CRT you channel-flip, on air only 00:00–04:44 on the visitor's devic
 - 1.4.3: 4.5:1 body text, 3:1 for 24px+. Check with axe and the contrast script.
 - Wrap every `localStorage` read/write in try/catch (cursed tape state). The app must work with storage blocked.
 
-## Commands (fill in as PR 1 lands)
-- `npm run dev`, `npm run build`, `npm test`, `npm run test:a11y`, `npm run lint`
+## Commands
+- `npm run dev` / `npm run build`: Vite dev server / production build to `dist/`.
+- `npm test`: Vitest unit tests (`src/**/*.test.js`).
+- `npm run test:a11y`: Playwright + axe-core (`tests/`); starts the dev server itself.
+- `npm run lint`: ESLint, Prettier check, then `lint:ja` (extracts Japanese copy to `build/ja-copy.txt` and runs textlint). `npm run format` fixes Prettier issues.
+- CI (`.github/workflows/ci.yml`) runs `npm ci`, lint, tests, build, then the Playwright suite. The Pages deploy workflow and `CNAME` are not set up yet.
