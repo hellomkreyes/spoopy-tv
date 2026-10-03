@@ -1,18 +1,6 @@
 /**
- * rack: the tape rack, the TV guide while off air or in a rerun.
- *
- * Functions
- *   renderRack({ playingCh, onPlay })  returns a <section> with one real <button> per listing
- *
- * Use
- *   stage.append(renderRack({ playingCh: '09', onPlay: (ch) => ... }))
- *   Leave playingCh unset to badge the default tape STARTS HERE; set it to badge
- *   that row PLAYING and mark it aria-current.
- *
- * Gotchas
- *   - Rows are built from schedule.json and copy from offAir.json; edit those, not this file.
- *   - 'so' (the 04:43 Luna Pie sign-off) shows SIGN-OFF in the CH column.
- *   - TODO (PR 3): becomes the full TV guide with an ON AIR marker when a channel is live.
+ * Tape rack (the guide while off air): renderRack({ playingCh, onPlay }).
+ * Rows and copy come from schedule.json and offAir.json.
  */
 import { el } from './dom.js';
 import { fill, to12h } from './format.js';

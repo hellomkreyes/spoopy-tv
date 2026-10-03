@@ -1,18 +1,7 @@
 /**
- * main: boots the app and picks which view to show.
- *
- * Flow
- *   rerun (?rerun in the URL)  -> rerunView
- *   off-air                    -> offAirView
- *   on-air / sign-off          -> liveView
- *   The real state is watched with scheduleNextBoundary and re-rendered when it changes.
- *
- * Gotchas
- *   - While a tape is in the deck the real clock is ignored; the rerun keeps its frozen time.
- *   - Playing or ejecting a tape updates the URL with history.replaceState (no reload)
- *     and moves focus to the new view's heading.
- *   - Sets <html data-ready="true"> once the first view is drawn; the e2e tests wait on it.
- *   - TODO (PR 4): channelController takes over view switching.
+ * Boot: ?rerun -> rerunView, off air -> offAirView, else liveView.
+ * While a tape is in the deck, real clock changes are ignored.
+ * TODO (PR 4): channelController takes over view switching.
  */
 import {
   currentListing,

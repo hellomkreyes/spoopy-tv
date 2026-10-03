@@ -1,15 +1,4 @@
-/**
- * liveView: placeholder for the on-air and sign-off states.
- *
- * Functions
- *   renderLive(stage, { state, listing })  returns a no-op teardown
- *
- * Use
- *   renderLive(stage, { state: 'on-air', listing: currentListing(now) })
- *
- * Gotchas
- *   - TODO (PR 3/4): replaced by the TV shell and channelController. Delete this file then.
- */
+/** On-air/sign-off placeholder. TODO (PR 3/4): delete when the TV shell lands. */
 import { el } from './dom.js';
 import { fill } from './format.js';
 import copy from './offAir.json';

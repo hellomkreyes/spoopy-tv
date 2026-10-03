@@ -1,19 +1,6 @@
 /**
- * rerunView: the Haunted Tape view with a RERUN bug, the frozen 04:20 clock and the rack.
- *
- * Functions
- *   renderRerun(stage, { ch, onPlay, onEject })  returns a teardown function
- *
- * Use
- *   const teardown = renderRerun(stage, { ch: '09', onPlay, onEject })
- *   Call teardown() before clearing the stage.
- *
- * Gotchas
- *   - The sign-off tape ('so') is a one-shot: it calls onEject after 60 s.
- *     Other tapes run until the visitor ejects.
- *   - The entry wobble is a CSS animation (.is-tuning), off under prefers-reduced-motion.
- *   - TODO (PR 4): channel playback replaces the placeholder text; the clock-synced
- *     timeline starts from tape start, not from 04:20.
+ * Haunted Tape view: renderRerun(stage, { ch, onPlay, onEject }) returns a teardown.
+ * The sign-off tape ejects itself after 60 s. TODO (PR 4): real channel playback.
  */
 import { el } from './dom.js';
 import { fill, to12h } from './format.js';
