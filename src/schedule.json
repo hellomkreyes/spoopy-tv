@@ -1,0 +1,44 @@
+{
+  "window": { "start": "00:00", "signOff": "04:43", "end": "04:44" },
+  "rerun": { "clock": "04:20", "default": "09" },
+  "coldOpen": "03",
+  "listings": [
+    {
+      "ch": "01",
+      "start": "03:00",
+      "show": "spirit-weather",
+      "title": "Spirit Weather Report"
+    },
+    {
+      "ch": "03",
+      "start": "03:15",
+      "show": "emergency-alert",
+      "title": "Emergency Alert"
+    },
+    {
+      "ch": "04",
+      "start": "03:33",
+      "show": "hypnosis",
+      "title": "Hypnosis Test Pattern"
+    },
+    {
+      "ch": "06",
+      "start": "03:45",
+      "show": "advice-line",
+      "title": "The 3AM Advice Line"
+    },
+    {
+      "ch": "07",
+      "start": "03:52",
+      "show": "shadow-play",
+      "title": "Shadow Play"
+    },
+    { "ch": "09", "start": "04:00", "show": "sky-watch", "title": "Sky Watch" },
+    {
+      "ch": "so",
+      "start": "04:43",
+      "show": "luna-pie-sign-off",
+      "title": "Luna Pie · Opening Theme"
+    }
+  ]
+}

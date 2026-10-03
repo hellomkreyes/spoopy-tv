@@ -1,0 +1,30 @@
+{
+  "title": "OFF AIR",
+  "titleJa": "放送休止",
+  "tagline": "BACK AT MIDNIGHT",
+  "resumes": "RESUMES IN",
+  "resumesText": "Broadcast resumes at 00:00 on your device's clock.",
+  "tapeLabel": "HAUNTED TAPE",
+  "tapeRec": "REC {time}",
+  "tapeButton": "PLAY THE HAUNTED TAPE · {time}",
+  "rack": {
+    "title": "TAPE RACK · RERUNS",
+    "intro": "Broadcast is over until midnight. Pick a recorded show to watch at {time}.",
+    "startsHere": "STARTS HERE",
+    "signOffLabel": "SIGN-OFF",
+    "play": "Play",
+    "playing": "PLAYING"
+  },
+  "rerun": {
+    "bug": "RERUN",
+    "eject": "EJECT TAPE",
+    "channel": "CH {ch}",
+    "signOffChannel": "SIGN-OFF",
+    "placeholder": "Channel playback arrives in a later update. The tape rack and the frozen clock are live."
+  },
+  "live": {
+    "onAir": "ON AIR",
+    "signOff": "SIGN-OFF",
+    "placeholder": "The TV arrives in a later update."
+  }
+}

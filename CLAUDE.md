@@ -40,6 +40,6 @@ A haunted CRT you channel-flip, on air only 00:00–04:44 on the visitor's devic
 ## Commands
 - `npm run dev` / `npm run build`: Vite dev server / production build to `dist/`.
 - `npm test`: Vitest unit tests (`src/**/*.test.js`).
-- `npm run test:a11y`: Playwright + axe-core (`tests/`); starts the dev server itself.
+- `npm run test:a11y`: Playwright + axe-core (`tests/`); builds and serves `vite preview` itself, so tests run with the CSP `<meta>` in force (it is injected at build time only, because the dev server's injected `<style>` tags would violate it). Tests pin the clock with `page.clock.install` and use `America/Toronto`.
 - `npm run lint`: ESLint, Prettier check, then `lint:ja` (extracts Japanese copy to `build/ja-copy.txt` and runs textlint). `npm run format` fixes Prettier issues.
 - CI (`.github/workflows/ci.yml`) runs `npm ci`, lint, tests, build, then the Playwright suite. The Pages deploy workflow and `CNAME` are not set up yet.
