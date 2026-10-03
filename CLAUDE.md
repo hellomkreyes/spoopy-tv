@@ -41,5 +41,6 @@ A haunted CRT you channel-flip, on air only 00:00–04:44 on the visitor's devic
 - `npm run dev` / `npm run build`: Vite dev server / production build to `dist/`.
 - `npm test`: Vitest unit tests (`src/**/*.test.js`).
 - `npm run test:a11y`: Playwright + axe-core (`tests/`); builds and serves `vite preview` itself, so tests run with the CSP `<meta>` in force (it is injected at build time only, because the dev server's injected `<style>` tags would violate it). Tests pin the clock with `page.clock.install` and use `America/Toronto`.
-- `npm run lint`: ESLint, Prettier check, then `lint:ja` (extracts Japanese copy to `build/ja-copy.txt` and runs textlint). `npm run format` fixes Prettier issues.
+- `npm run lint`: ESLint, Prettier check, `lint:ja` (extracts Japanese copy to `build/ja-copy.txt` and runs textlint), then `lint:fonts`. `npm run format` fixes Prettier issues.
+- `npm run fonts`: regenerates the self-hosted font subsets in `src/fonts/` (picks `@fontsource` slices for the glyphs used in `src/**/*.json`). Run it and commit the result whenever copy gains a new character; `lint:fonts` fails CI if the output is stale or a glyph has no font.
 - CI (`.github/workflows/ci.yml`) runs `npm ci`, lint, tests, build, then the Playwright suite. `.github/workflows/deploy.yml` publishes `dist/` to GitHub Pages on push to `main` (`public/CNAME` = tv.chibimuere.com).
