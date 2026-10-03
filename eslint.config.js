@@ -14,4 +14,6 @@ export default [
     ],
     languageOptions: { globals: globals.node },
   },
+  // Playwright callbacks passed to evaluate() run in the browser.
+  { files: ['tests/**/*.js'], languageOptions: { globals: globals.browser } },
 ];
