@@ -3,6 +3,8 @@
 :root {
   color-scheme: dark;
   --bg: #0c0914;
+  /* Page colour behind the header (sampled from the body gradient); see .wordmark. */
+  --header-bg: #120c20;
   --ink: #f1ecf7;
   --muted: #b7aecb;
   --screen: #05030a;
@@ -105,6 +107,9 @@ a {
   line-height: 1.1;
   letter-spacing: 0.04em;
   color: var(--ink);
+  /* Dela Gothic One has one weight. A 1px stroke in the page colour eats ~0.5px off each
+     stroke edge so 電 doesn't clog at this size. Update --header-bg if the background changes. */
+  -webkit-text-stroke: 1px var(--header-bg);
   text-shadow:
     2px 0 var(--magenta),
     -2px 0 #3cc8ff;
