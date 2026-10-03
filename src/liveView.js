@@ -1,4 +1,11 @@
-/** On-air/sign-off placeholder. TODO (PR 3/4): delete when the TV shell lands. */
+/**
+ * Placeholder for the on-air and sign-off states.
+ *
+ * Functions
+ *   renderLive(stage, { state, listing })  draws a heading for the live show; returns a no-op teardown
+ *
+ * TODO (PR 3/4): delete this when the TV shell and channelController land.
+ */
 import { el } from './dom.js';
 import { fill } from './format.js';
 import copy from './offAir.json';

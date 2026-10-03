@@ -1,6 +1,11 @@
 /**
- * ?rerun helpers: parseRerun(search) -> channel id or null, frozenNow(now) -> today at 04:20.
- * Bad or empty values fall back to the default tape (Sky Watch).
+ * Helpers for ?rerun mode (the Haunted Tape), where the clock is frozen at 04:20.
+ *
+ * Functions
+ *   parseRerun(search)  channel id ('04', 'so', ...) or null if not a rerun
+ *   frozenNow(now)      today's date pinned to 04:20
+ *
+ * Gotcha: bad, empty or unknown values fall back to the default tape (Sky Watch).
  */
 import schedule from './schedule.json';
 

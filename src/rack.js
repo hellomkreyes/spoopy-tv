@@ -1,6 +1,11 @@
 /**
- * Tape rack (the guide while off air): renderRack({ playingCh, onPlay }).
- * Rows and copy come from schedule.json and offAir.json.
+ * The tape rack: the TV guide while off air or in a rerun.
+ *
+ * Functions
+ *   renderRack({ playingCh, onPlay })  a <section> with one real <button> per listing;
+ *                                      playingCh marks the current tape
+ *
+ * Rows come from schedule.json and copy from offAir.json.
  */
 import { el } from './dom.js';
 import { fill, to12h } from './format.js';

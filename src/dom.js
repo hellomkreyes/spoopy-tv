@@ -1,5 +1,9 @@
 /**
- * el(tag, props, ...children) builds DOM without HTML strings.
+ * Builds DOM without HTML strings, so copy is always text.
+ *
+ * Functions
+ *   el(tag, props, ...children)  props: `class`, `on*` listeners, plain attributes
+ *
  * Gotcha: the CSP blocks inline `style`; use classes.
  */
 export function el(tag, props = {}, ...children) {

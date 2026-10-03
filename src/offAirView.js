@@ -1,5 +1,10 @@
 /**
- * OFF AIR card + tape rack: renderOffAir(stage, { onPlay }) returns a teardown; call it before clearing.
+ * The OFF AIR test card (countdown, Haunted Tape button) beside the tape rack.
+ *
+ * Functions
+ *   renderOffAir(stage, { onPlay })  draws into `stage`; returns a teardown function
+ *
+ * Gotcha: call the teardown before clearing the stage; it stops the countdown timer.
  */
 import { msUntilMidnight } from './broadcastClock.js';
 import { el } from './dom.js';

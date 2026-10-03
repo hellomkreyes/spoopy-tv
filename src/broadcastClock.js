@@ -1,7 +1,14 @@
 /**
- * What's on air, from local wall-clock fields (never elapsed ms, so DST can't shift it).
- * Pure functions of `now`; in the app, call scheduleNextBoundary(cb) once.
- * Gotcha: no single long setTimeout; it re-checks on visibilitychange/focus/pageshow.
+ * Decides what is on air, from local wall-clock fields (never elapsed ms, so DST can't shift it).
+ *
+ * Functions (all take `now`, so tests can pass any Date)
+ *   state(now)                        'on-air' | 'sign-off' | 'off-air'
+ *   currentListing(now)               the live show from schedule.json, or null off air
+ *   nextBoundary(now)                 next local time the state or live show changes
+ *   msUntilMidnight(now)              real ms to local midnight (23 h or 25 h on DST days)
+ *   scheduleNextBoundary(cb, getNow)  calls cb({ state, listing }) on each change; returns stop()
+ *
+ * Gotcha: no single long setTimeout. The watcher re-checks on visibilitychange/focus/pageshow.
  */
 import schedule from './schedule.json';
 

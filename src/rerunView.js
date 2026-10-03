@@ -1,6 +1,11 @@
 /**
- * Haunted Tape view: renderRerun(stage, { ch, onPlay, onEject }) returns a teardown.
- * The sign-off tape ejects itself after 60 s. TODO (PR 4): real channel playback.
+ * The Haunted Tape view: RERUN bug, frozen 04:20 clock, EJECT button and the rack.
+ *
+ * Functions
+ *   renderRerun(stage, { ch, onPlay, onEject })  draws into `stage`; returns a teardown function
+ *
+ * Gotcha: the sign-off tape ('so') ejects itself after 60 s; other tapes run until ejected.
+ * TODO (PR 4): replace the placeholder text with real channel playback.
  */
 import { el } from './dom.js';
 import { fill, to12h } from './format.js';

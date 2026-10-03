@@ -1,4 +1,11 @@
-/** Copy helpers: to12h('04:20'), countdown(ms) -> 'HH:MM:SS', fill('REC {time}', { time }). */
+/**
+ * Small helpers for screen copy.
+ *
+ * Functions
+ *   to12h('04:20')      '04:20 AM'
+ *   countdown(ms)       'HH:MM:SS' (rounded up, so 00:00:00 only shows at zero)
+ *   fill(text, values)  swaps {name} slots in copy: fill('REC {time}', { time })
+ */
 const pad = (n) => String(n).padStart(2, '0');
 
 /** '04:20' -> '04:20 AM' */

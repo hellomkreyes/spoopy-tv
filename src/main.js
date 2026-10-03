@@ -1,6 +1,12 @@
 /**
- * Boot: ?rerun -> rerunView, off air -> offAirView, else liveView.
- * While a tape is in the deck, real clock changes are ignored.
+ * Boots the app and picks the view:
+ *   ?rerun in the URL -> rerunView
+ *   off air           -> offAirView
+ *   on air / sign-off -> liveView
+ *
+ * Gotchas
+ *   - While a tape is in the deck, real clock changes are ignored.
+ *   - Sets <html data-ready="true"> after the first draw; the e2e tests wait on it.
  * TODO (PR 4): channelController takes over view switching.
  */
 import {
