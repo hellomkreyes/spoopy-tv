@@ -1,4 +1,20 @@
-// ?rerun mode: the Haunted Tape. Clock is frozen at schedule.rerun.clock.
+/**
+ * rerun: helpers for ?rerun mode (the Haunted Tape), where the clock is frozen at 04:20.
+ *
+ * Functions
+ *   parseRerun(search)  null if not a rerun, else a valid channel id ('04', 'so', ...)
+ *   frozenNow(now)      today's date pinned to schedule.rerun.clock
+ *   listings, rerunClock, rerunDefault   re-exports from schedule.json
+ *
+ * Use
+ *   parseRerun(location.search) at boot. Plain ?rerun, an empty value, or an
+ *   unknown channel falls back to schedule.rerun.default (Sky Watch).
+ *
+ * Gotchas
+ *   - Single digits are padded ('?rerun=4' is CH 04); values are lowercased.
+ *   - frozenNow only pins the guide and on-screen time. Channel loops run from tape start.
+ *   - TODO (PR 4): feed frozenNow into the guide's ON AIR marker once the TV shell exists.
+ */
 import schedule from './schedule.json';
 
 export const listings = schedule.listings;

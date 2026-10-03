@@ -1,5 +1,25 @@
-// Decides what is on air. Pure functions of `now`, read as local wall-clock
-// fields (never elapsed ms) so a DST jump can't shift the window.
+/**
+ * broadcastClock: decides what is on air. Pure functions of `now`, read from
+ * local wall-clock fields (never elapsed ms) so a DST jump can't shift the window.
+ *
+ * Functions
+ *   state(now)                       'on-air' | 'sign-off' | 'off-air'
+ *   currentListing(now)              live listing from schedule.json, or null off air
+ *   nextBoundary(now)                next local Date the state or live listing changes
+ *   msUntilMidnight(now)             real ms to the next local midnight
+ *   scheduleNextBoundary(cb, getNow) calls cb({ state, listing }) on each change; returns stop()
+ *
+ * Use
+ *   Always pass `now` (tests pass any Date). In the app, call
+ *   scheduleNextBoundary(onChange) once and re-render inside onChange.
+ *
+ * Gotchas
+ *   - Never replace the watcher with one long setTimeout: background tabs throttle
+ *     timers. It sleeps at most 30 s and re-checks on visibilitychange/focus/pageshow.
+ *   - msUntilMidnight is real time, so it is 23 h or 25 h on DST days. Display only.
+ *   - Before the first listing (03:00) the live listing is the cold open (schedule.coldOpen).
+ *   - TODO (PR 11): the 04:43 sign-off card plays from this state; nothing renders it yet.
+ */
 import schedule from './schedule.json';
 
 const toMinutes = (hhmm) => {

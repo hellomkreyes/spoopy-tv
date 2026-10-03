@@ -1,3 +1,20 @@
+/**
+ * offAirView: the OFF AIR test card (countdown, Haunted Tape button) plus the tape rack.
+ *
+ * Functions
+ *   renderOffAir(stage, { onPlay })  appends the view to `stage`; returns a teardown function
+ *
+ * Use
+ *   const teardown = renderOffAir(stage, { onPlay: (ch) => ... })
+ *   Call teardown() before clearing the stage; it stops the countdown interval.
+ *
+ * Gotchas
+ *   - The countdown is recomputed from the clock every second, not decremented, so a
+ *     throttled tab can't drift. It is not an aria-live region; a static sentence
+ *     tells screen readers when the broadcast resumes.
+ *   - The tape button plays schedule.rerun.default.
+ *   - Hitting midnight is handled by main.js (scheduleNextBoundary), not here.
+ */
 import { msUntilMidnight } from './broadcastClock.js';
 import { el } from './dom.js';
 import { countdown, fill, to12h } from './format.js';

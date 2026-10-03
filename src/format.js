@@ -1,3 +1,15 @@
+/**
+ * format: small string helpers for the screen copy.
+ *
+ * Functions
+ *   to12h('04:20')       '04:20 AM'
+ *   countdown(ms)        'HH:MM:SS', rounded up so 00:00:00 only shows at zero
+ *   fill(text, values)   replaces {name} slots in copy strings, e.g. fill('REC {time}', { time })
+ *
+ * Gotchas
+ *   - fill() swaps a missing value for '' instead of throwing; check the copy JSON keys.
+ *   - Results are plain text. Insert them with el()/textContent, never innerHTML.
+ */
 const pad = (n) => String(n).padStart(2, '0');
 
 /** '04:20' -> '04:20 AM' */
