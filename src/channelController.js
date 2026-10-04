@@ -133,17 +133,31 @@ export function createController({ shell, fx }) {
   }
 
   function renderGuideIfChanged() {
-    const key = `${store.mode}|${store.tape}|${store.mode === 'live' ? clock.listing?.ch : ''}`;
+    const live = store.mode === 'live';
+    const canTune = live && store.power && clock.state === 'on-air';
+    const key = [
+      store.mode,
+      store.tape,
+      live ? `${clock.listing?.ch}|${store.ch}|${canTune}` : '',
+    ].join('|');
     if (key === guideKey) return;
     guideKey = key;
+    // Re-rendering replaces the buttons, so give focus back to the same row.
+    const focused = shell.guide.contains(document.activeElement)
+      ? document.activeElement.dataset.ch
+      : null;
     shell.guide.replaceChildren(
       renderGuide({
         mode: store.mode,
         listing: clock.listing,
+        tunedCh: store.ch,
+        canTune,
+        onTune: tune,
         playingCh: store.tape,
         onPlay: play,
       }),
     );
+    if (focused) shell.guide.querySelector(`[data-ch="${focused}"]`)?.focus();
   }
 
   function teardownCurrent() {
@@ -255,6 +269,7 @@ export function createController({ shell, fx }) {
   const flip = (dir) => store.power && queue.request({ type: 'flip', dir });
   const tuneDigit = (n) =>
     n !== 0 && queue.request({ type: 'to', ch: `0${n}` });
+  const tune = (ch) => queue.request({ type: 'to', ch });
   const play = (ch) => queue.request({ type: 'play', ch });
   const eject = () => queue.request({ type: 'eject' });
 
@@ -268,6 +283,7 @@ export function createController({ shell, fx }) {
       teardownCurrent();
       shell.led.set(null);
       updateControls();
+      renderGuideIfChanged(); // live rows disable while powered off
       notify();
     });
   }

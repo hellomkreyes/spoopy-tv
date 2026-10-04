@@ -71,7 +71,8 @@
     "onAir": "ON AIR",
     "signOffLabel": "SIGN-OFF",
     "signalLostCh": "CH 00",
-    "signalLost": "signal lost"
+    "signalLost": "signal lost",
+    "tune": "Tune to"
   },
   "footer": {
     "left": "A CHIBI MUERE TRANSMISSION",

@@ -3,13 +3,16 @@
  * tape rack, where every listing is a real <button> that starts that tape.
  *
  * Functions
- *   renderGuide({ mode, listing, playingCh, onPlay })
+ *   renderGuide({ mode, listing, tunedCh, canTune, onTune, playingCh, onPlay })
  *     mode       'live' | 'off' | 'rerun'
- *     listing    the live listing (live mode: gets the ON AIR marker)
+ *     listing    the listing the clock says is live (live mode: gets the ON AIR badge)
+ *     tunedCh    the channel on screen (live mode: gets the highlight)
+ *     canTune    false disables the live rows (sign-off, power off)
+ *     onTune     called with a channel id when a live row is pressed
  *     playingCh  the tape in the deck (rerun mode: gets PLAYING)
+ *     onPlay     called with a channel id when a tape row is pressed
  *
  * Gotcha: the 04:43 sign-off is a tape-rack row only; it is not a channel on the live guide.
- * TODO (PR 4): live rows become buttons that tune the channel.
  */
 import { el } from './dom.js';
 import { fill, to12h } from './format.js';
@@ -32,26 +35,41 @@ const signalLost = () =>
     ),
   );
 
-function liveRows(listing) {
+function liveRows({ listing, tunedCh, canTune, onTune }) {
   return listings
     .filter((l) => l.ch !== 'so')
-    .map((l) => {
-      const isLive = l.ch === listing?.ch;
-      return el(
+    .map((l) =>
+      el(
         'li',
-        { class: 'guide-row', 'aria-current': isLive ? 'true' : null },
-        el('time', { class: 'guide-time' }, l.start),
-        el('span', { class: 'guide-ch' }, `CH ${l.ch}`),
+        { class: 'guide-row guide-row-tape' },
         el(
-          'span',
-          { class: 'guide-title' },
-          l.title,
-          isLive
-            ? el('span', { class: 'guide-badge' }, ` ● ${shell.guide.onAir}`)
-            : null,
+          'button',
+          {
+            type: 'button',
+            class: 'guide-item guide-item-live',
+            'data-ch': l.ch,
+            'aria-current': l.ch === tunedCh ? 'true' : null,
+            disabled: !canTune,
+            onclick: () => onTune(l.ch),
+          },
+          el('span', { class: 'sr-only' }, shell.guide.tune),
+          el('time', { class: 'guide-time' }, l.start),
+          el('span', { class: 'guide-ch' }, `CH ${l.ch}`),
+          el(
+            'span',
+            { class: 'guide-title' },
+            l.title,
+            l.ch === listing?.ch
+              ? el(
+                  'span',
+                  { class: 'guide-badge guide-badge-live' },
+                  ` ● ${shell.guide.onAir}`,
+                )
+              : null,
+          ),
         ),
-      );
-    });
+      ),
+    );
 }
 
 function rackRows(playingCh, onPlay) {
@@ -94,7 +112,15 @@ function rackRows(playingCh, onPlay) {
   });
 }
 
-export function renderGuide({ mode, listing, playingCh, onPlay }) {
+export function renderGuide({
+  mode,
+  listing,
+  tunedCh,
+  canTune,
+  onTune,
+  playingCh,
+  onPlay,
+}) {
   const isLive = mode === 'live';
   return el(
     'section',
@@ -114,7 +140,9 @@ export function renderGuide({ mode, listing, playingCh, onPlay }) {
     el(
       'ol',
       { class: 'guide-list' },
-      isLive ? liveRows(listing) : rackRows(playingCh, onPlay),
+      isLive
+        ? liveRows({ listing, tunedCh, canTune, onTune })
+        : rackRows(playingCh, onPlay),
       signalLost(),
     ),
   );
