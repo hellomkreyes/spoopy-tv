@@ -77,5 +77,10 @@
     "left": "A CHIBI MUERE TRANSMISSION",
     "leftExtra": "BROADCASTING FROM TORONTO AFTER MIDNIGHT",
     "right": "MADE WITH GSAP · NO COOKIES · NO GHOSTS HARMED"
+  },
+  "static": {
+    "tuning": "受信中 · TUNING",
+    "channel": "CH {ch} ▶",
+    "signOff": "SIGN-OFF ▶"
   }
 }

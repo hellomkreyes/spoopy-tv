@@ -47,6 +47,7 @@ export function createLed() {
 
   function set(ch, title) {
     digits.textContent = ch == null ? '– –' : ch.toUpperCase();
+    digits.classList.toggle('is-dim', ch == null);
     if (ch == null) announce(copy.led.off);
     else if (ch === 'so') announce(fill(copy.led.signOff, { title }));
     else announce(fill(copy.led.channel, { ch: Number(ch), title }));

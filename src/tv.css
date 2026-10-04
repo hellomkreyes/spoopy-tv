@@ -23,9 +23,73 @@
     inset 0 0 40px rgba(0, 0, 0, 0.9);
 }
 
+.crt {
+  /* Vertical swipes on the screen change channel; horizontal pans and pinch still work. */
+  touch-action: pan-x pinch-zoom;
+}
+
 .crt-content {
   position: relative;
   min-height: 100%;
+}
+
+/* Rerun bug and EJECT sit above the channel but under the static. */
+.crt-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.crt-overlay > * {
+  pointer-events: auto;
+}
+
+/* The static burst: one canvas scaled up from 160x120, plus the tuning labels. */
+.static-layer {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background: #787878;
+}
+
+.static-layer.is-on {
+  display: block;
+}
+
+.static-canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.static-ch {
+  position: absolute;
+  top: 6%;
+  right: 6%;
+  font-family: var(--label);
+  font-size: clamp(0.9rem, 3vw, 1.6rem);
+  letter-spacing: 0.1em;
+  color: var(--green);
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+}
+
+.static-tuning {
+  position: absolute;
+  bottom: 6%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--label);
+  font-size: clamp(0.8rem, 2.6vw, 1.2rem);
+  letter-spacing: 0.25em;
+  color: #e9e3f0;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.9);
+}
+
+/* POWER off: a hard cut to black. */
+.crt.is-off .crt-content,
+.crt.is-off .crt-overlay {
+  visibility: hidden;
 }
 
 /* Scanlines and vignette are plain CSS gradients: no per-frame cost. */
@@ -80,6 +144,11 @@
   line-height: 1;
   color: var(--coral);
   text-shadow: 0 0 10px rgba(255, 122, 102, 0.6);
+}
+
+.led-digits.is-dim {
+  color: #9c4d42; /* dimmed, but still 3.3:1 on the LED (WCAG 1.4.3 large text) */
+  text-shadow: none;
 }
 
 .ctl {
