@@ -4,7 +4,7 @@ Oct 1, 2026 · @M.K. Muere
 
 ## Overview
 
-Kaidenpa is a single-page haunted CRT at tv.chibimuere.com. It broadcasts six channels between midnight and 04:44 on the visitor's own clock and goes off air the rest of the day. It ships as 13 small PRs: 6 owned by Claude Code (CC), 7 by Luna Pie.
+Kaidenpa is a single-page haunted CRT at tv.chibimuere.com. It broadcasts six channels between midnight and 04:44 on the visitor's own clock and goes off air the rest of the day. It ships as 14 small PRs: 7 owned by Claude Code (CC), 7 by Luna Pie.
 
 | Layer | Choice | Why |
 | --- | --- | --- |
@@ -12,12 +12,32 @@ Kaidenpa is a single-page haunted CRT at tv.chibimuere.com. It broadcasts six ch
 | Motion | GSAP core + SplitText + DrawSVGPlugin | Timelines can be paused, scrubbed and synced to the clock |
 | Effects | CSS first, SVG filters for still textures, one 2D canvas for static | CSS and SVG are cheap; canvas only where pixels change every frame |
 | Copy | JSON per channel + schedule.json | Luna Pie missions edit data, not markup |
-| Fonts | Dela Gothic One, DotGothic16, Zen Kaku Gothic New, self-hosted subsets | Japanese fonts are large; subsetting keeps only the glyphs we use |
+| Fonts | Dela Gothic One, DotGothic16, Zen Kaku Gothic New, Noto Sans Tagalog (Baybayin), self-hosted subsets | Japanese fonts are large; subsetting keeps only the glyphs we use |
 | Tests | Playwright (clock + timezone control) + axe-core + textlint (Japanese copy) | Every on-air, off-air and reduced-motion state is tested |
 | Hosting | GitHub Pages, CNAME tv.chibimuere.com, $0 | Same as rx.chibimuere.com |
-| Audio (v2) | Web Audio API, built into browsers, no library | Synthesized hum, static and blips cost a few KB and need no licences; opt-in only. Details in Audio (v2) below |
+| Audio (v1, opt-in) | Web Audio API, built into browsers, no library | Synthesized hum, static and blips cost a few KB and need no licences; opt-in only. Pre-1923 UCSB cylinder clips are self-hosted and credited. Details in Audio below |
 
-There's no audio in v1, so the site has no volume control. Audio is planned for v2 as an opt-in (see Audio (v2) below).
+Audio ships in v1 as an opt-in: off by default, behind a visible SOUND button with mute and pause, never autoplaying (see Audio below).
+
+## Hybrid direction (Japanese and Filipino)
+
+From 2026-10-04 Kaidenpa is a hybrid: most channels stay Japanese, CH 04 and CH 06 are Tagalog, and every channel gains a big decorative Baybayin word. The goal is to culturally reclaim Filipino cryptids and mystics, aswang above all, using the Wikipedia article on witchcraft in the Philippines and the Aswang Project as folklore sources.
+
+| Channel | Version | Baybayin accent | Notes |
+| --- | --- | --- | --- |
+| CH 01 Spirit Weather | Japanese | bakunawa | Big outlined word behind the map |
+| CH 03 Alert | Japanese | babala | Behind the title |
+| CH 04 Hypnosis | Tagalog + English | titigan, kulam | HIPNOSIS 4; spiral kept; every Tagalog line has an English line |
+| CH 06 Advice Line | Tagalog | kulam, albularyo, mangkukulam | PAYO NG 3AM; albularyo and mangkukulam hosts |
+| CH 07 Shadow Play | Japanese | aswang | Behind the shadow play |
+| CH 09 Sky Watch | Japanese | santelmo | Over the sea |
+| CH 00 Cursed Tape | Japanese | sumpa (tape-spent screen only) | Cursed tape is the Japanese original; the uncurse screen carries the big Baybayin word |
+
+Off air, the sign-off and the Haunted Tape are unchanged for now; the off-air title is an open question.
+
+**Baybayin rules.** It is decorative only. It is real Unicode text (Tagalog block, U+1700–171F) set in Noto Sans Tagalog, wrapped in `role="img"`, `lang="tl-Tglg"` and an English `aria-label`, so screen readers announce the label and skip the glyphs. Nothing may be understood only through Baybayin. The font is self-hosted as a subset like the others, and its licence is confirmed in PR 3. The mock PNGs use a fallback font, so their Baybayin looks blocky; the live canvas shows the real glyphs. MK reviews every spelling in the copy sheet.
+
+**Copy checks.** textlint stays in CI for the Japanese strings only. Tagalog lines are reviewed by MK in the copy sheet before launch; there is no automated Tagalog check.
 
 ## Broadcast timing and the midnight gate
 
@@ -123,7 +143,7 @@ When the site is off air, it still has to make sense: the test card says when th
 
 ## PR breakdown
 
-Thirteen PRs, in order. CC builds the foundations and the risky channels; Luna Pie copies patterns once CH 03 exists. Each Luna mission covers one PR and gets the CH 03 folder as its pattern file.
+Fourteen PRs, in order. CC builds the foundations and the risky channels; Luna Pie copies patterns once CH 03 exists. Each Luna mission covers one PR and gets the CH 03 folder as its pattern file.
 
 | # | PR | Owner | Depends on | Done when |
 | --- | --- | --- | --- | --- |
@@ -133,17 +153,18 @@ Thirteen PRs, in order. CC builds the foundations and the risky channels; Luna P
 | 4 | `channelController.js`, `motion.js`, `fx.js` static burst, flip queue, global pause, reduced motion | CC | 2, 3 | Flip, pause and reduced-motion tests pass on a placeholder channel |
 | 5 | CH 03 Emergency Alert, the reference channel | CC | 4 | Loop, still frame, transcript and tests all in place |
 | 6 | CH 01 Spirit Weather | Luna | 5 | Same checklist as CH 03 |
-| 7 | CH 06 Advice Line | Luna | 5 | Same checklist |
-| 8 | CH 04 Hypnosis | CC | 5 | Same checklist, plus a manual motion-comfort review |
+| 7 | CH 06 Advice Line (Tagalog) | Luna | 5 | Same checklist |
+| 8 | CH 04 Hypnosis (Tagalog + English) | CC | 5 | Same checklist, plus a manual motion-comfort review |
 | 9 | CH 07 Shadow Play | Luna | 5 | Same checklist; the neck draw also has a still frame |
 | 10 | CH 09 Sky Watch + canvas starfield | CC | 5 | Same checklist; canvas stops when hidden |
 | 11 | CH 00 Cursed Tape + `konami.js` (with a touch version) + the 04:43 Luna Pie sign-off card | Luna | 2, 5 | Konami code tunes to CH 00 on keyboard (arrows + B A) and touch (swipes + two LED taps); the tape starts at 13:00, burns only while CH 00 is watched, never refills on its own, and UNCURSE THE TAPE refills it; the counter survives a reload and a blocked `localStorage`; the sign-off plays at 04:43 in the clock tests |
-| 12 | Test matrix: every channel × {motion, reduced} × {desktop, mobile} × {on air, off air, rerun}, plus screenshot baselines | Luna (Jupiter) | 6–11 | Suite is green in CI |
-| 13 | Audit and launch: Lighthouse, axe, perf budget, OG image, project card on chibimuere.com | Luna (Mars) | 12 | Lighthouse a11y 100, perf ≥ 90 on mobile |
+| 12 | Audio (opt-in): SOUND button, `audio.js` Web Audio chain, synthesized hum, static and stingers, self-hosted pre-1923 UCSB cylinder clips, `credits.json` and a credits panel | CC | 4, 6–11 | Off by default and never autoplays; pauses with MOTION; every clip has a credits entry and a confirmed pre-1923 date; each clip ≤ 250 KB and loaded on tune |
+| 13 | Test matrix: every channel × {motion, reduced} × {desktop, mobile} × {on air, off air, rerun}, plus screenshot baselines | Luna (Jupiter) | 6–12 | Suite is green in CI |
+| 14 | Audit and launch: Lighthouse, axe, perf budget, OG image, project card on chibimuere.com | Luna (Mars) | 13 | Lighthouse a11y 100, perf ≥ 90 on mobile |
 
 PRs 6, 7, 9 and 11 can run in parallel once PR 5 merges. Use the cheaper models for 12 and 13.
 
-**Japanese copy checks in CI.** textlint with `textlint-rule-preset-ja-technical-writing` runs in CI from PR 1. textlint reads Markdown and plain text, not our channel JSON, so a small script (`scripts/extract-ja-copy.mjs`) pulls every Japanese string out of `chNN.json` and `schedule.json` into one text file, one string per line, and textlint lints that. The preset is written for technical prose, so `.textlintrc.json` turns off any rules that don't suit short display titles (for example the period rule) and notes why in a comment. It catches typos, mixed politeness levels and awkward patterns. It can't judge tone or folklore, so a native-speaker review still happens before launch.
+**Japanese copy checks in CI.** textlint with `textlint-rule-preset-ja-technical-writing` runs in CI from PR 1. textlint reads Markdown and plain text, not our channel JSON, so a small script (`scripts/extract-ja-copy.mjs`) pulls every Japanese string out of `chNN.json` and `schedule.json` into one text file, one string per line, and textlint lints that. The preset is written for technical prose, so `.textlintrc.json` turns off any rules that don't suit short display titles (for example the period rule) and notes why in a comment. It catches typos, mixed politeness levels and awkward patterns. It can't judge tone or folklore, so MK reviews the copy sheet before launch.
 
 ## Stack risks
 
@@ -165,14 +186,14 @@ The biggest risk isn't technical: most people who matter will visit during the d
 | Cursed tape storage | `localStorage` is blocked in some private windows and wiped when people clear site data, so the curse resets | Every read and write is in try/catch; with no storage the tape starts full each visit. It stays on the device and is never sent anywhere |
 | Timeline and SplitText leaks | Memory grows after many flips | `context.revert()` on exit; a test flips 50 times and checks the heap |
 | Vanilla JS state sprawl | Ad-hoc globals once six channels share state | One small store in the controller (state plus events); rethink if it passes about 150 lines |
-| Japanese copy and folklore | Awkward phrasing or careless use of folklore | textlint (ja-technical-writing preset) in CI for typos and style, then a native-speaker review before launch; the review sheet is ready |
+| Japanese copy and folklore | Awkward phrasing or careless use of folklore | textlint (ja-technical-writing preset) in CI for typos and style, MK's own review of the copy sheet before launch |
 | Luna Pie cost | Missions balloon | One PR per mission, the existing spending cap, cheaper models for tests and audits |
 
-## Audio (v2)
+## Audio (v1, opt-in)
 
-Audio waits for v2 and ships as an opt-in: a SOUND button, off by default, with no autoplay (browsers block it anyway, and WCAG 1.4.2 asks for an audio control). The choice is remembered in `localStorage` inside try/catch. The plan is one low ambient bed plus a short stinger per channel and the tuning static. We won't use commercial anime or J-pop music, including the song that inspired the look.
+Audio ships in v1 as an opt-in: a SOUND button, off by default, with no autoplay (browsers block it anyway, and WCAG 1.4.2 asks for an audio control). The choice is remembered in `localStorage` inside try/catch. The plan is one low ambient bed plus a short stinger per channel and the tuning static. We won't use commercial anime or J-pop music, including the song that inspired the look.
 
-**How v2 uses the Web Audio API** (no audio library):
+**How audio uses the Web Audio API** (no audio library):
 
 - One `audio.js` module, loaded with a dynamic `import()` the first time someone presses SOUND, so v1 never touches audio.
 - The `AudioContext` is created or resumed inside that button's click handler. Browsers, iOS Safari especially, refuse to start audio any other way, so the page never creates a context before a tap. A Playwright test checks this.
@@ -193,6 +214,15 @@ Audio waits for v2 and ships as an opt-in: a SOUND button, off by default, with 
 
 My suggestion: synthesize the hum, static and blips (zero licensing risk), and pick one or two CC BY or CC0 ambient beds for the drone, with credits in the footer.
 
+**Cylinder recordings.** Channel audio uses clips from the [UCSB Cylinder Audio Archive](https://cylinders.library.ucsb.edu/licensing.php). Per its licensing page, cylinders recorded before Dec 31, 1922 are public domain and free for any use; later cylinders' MP3s are CC BY-NC 2.5 (© The Regents of the University of California, credit required) and WAVs are paid licences. Rules:
+
+- Pre-1923 cylinders only, and each clip's recording or issue date is confirmed on its archive page before it ships.
+- Use the free MP3 downloads, trimmed to short mono loops (about 15–30 s, ≤ 250 KB). Self-host them in `public/audio/`; never hotlink the archive.
+- Credit every track anyway: a `src/audio/credits.json` entry per clip (title, performer, label and number, year, archive URL, licence), rendered in a credits/about panel. Credit line: "University of California, Santa Barbara Library, UCSB Cylinder Audio Archive."
+- Screen every clip for content: many vaudeville and minstrel-era cylinders carry racist lyrics or caricature, and those are excluded.
+- Processing on top is fine: bandpass "radio" or telephone filter, slowed playback, warble (LFO on `playbackRate`/`detune`), crackle and static, reversed buffers for CH 00.
+- The existing audio rules still hold: off by default, visible mute and pause, never autoplay (WCAG 1.4.2).
+
 ## Decisions and open questions
 
 - [x] Window: the broadcast ends at 04:44 to match the mirror warning. Sign-off runs 04:43–04:44.
@@ -200,6 +230,6 @@ My suggestion: synthesize the hum, static and blips (zero licensing risk), and p
 - [x] Touch Konami: swipes ↑↑↓↓←→←→, then two taps on the LED.
 - [x] Reruns include the Luna Pie sign-off, as a pickable 04:43 row in the guide.
 - [x] Repo: `hellomkreyes/spoopy-tv` (project name stays Kaidenpa).
-- [x] Audio: v2, opt-in, built with the Web Audio API. Options are in Audio (v2) above.
+- [x] Audio: v1, opt-in, built with the Web Audio API: synthesized hum, static and stingers plus self-hosted pre-1923 UCSB cylinder clips, each credited. Details in Audio above.
 - [x] Cursed Tape: starts with 13 minutes of tape and never refills on its own. When it runs out, an UNCURSE THE TAPE button refills it to 13:00.
-- [ ] Who does the native-speaker review of the Japanese copy? Options: HiNative (free), a Fiverr proofreader or an italki tutor. The review sheet is ready.
+- [x] Copy review: MK reviews the hybrid copy sheet herself (Tagalog lines, Japanese readings, Baybayin spellings). A native Japanese check stays optional.
