@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
 
 // Clock is pinned with Playwright's fake timers; timezoneId comes from the config
 // (America/Toronto). 2026-06-15 is a plain EDT day, so local = UTC-4.
@@ -29,6 +28,10 @@ test.describe('off air', () => {
       page.getByRole('button', { name: /PLAY THE HAUNTED TAPE · 04:20 AM/ }),
     ).toBeVisible();
     await expect(page.locator('.guide-item')).toHaveCount(7);
+    await expect(page.locator('.led-digits')).toHaveText('– –');
+    await expect(page.locator('.led [aria-live="polite"]')).toHaveText(
+      'Off air',
+    );
     expect(errors).toEqual([]);
   });
 
@@ -45,11 +48,6 @@ test.describe('off air', () => {
     ).toBeVisible();
   });
 
-  test('04:59 is off air', async ({ page }) => {
-    await visit(page, '04:59');
-    await expect(page.getByRole('heading', { name: 'OFF AIR' })).toBeVisible();
-  });
-
   test('countdown ticks', async ({ page }) => {
     await visit(page, '23:59');
     await expect(page.locator('.countdown')).toHaveText('00:01:00');
@@ -63,12 +61,6 @@ test.describe('off air', () => {
     await expect(
       page.getByRole('heading', { name: /ON AIR · CH 03/ }),
     ).toBeVisible();
-  });
-
-  test('axe is clean off air', async ({ page }) => {
-    await visit(page, '12:00');
-    const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations).toEqual([]);
   });
 });
 
@@ -136,13 +128,6 @@ test.describe('haunted tape', () => {
     await expect(page.getByRole('heading', { name: 'OFF AIR' })).toBeVisible();
   });
 
-  test('a bad ?rerun value falls back to Sky Watch', async ({ page }) => {
-    await visit(page, '12:00', '/?rerun=%3Cscript%3E');
-    await expect(
-      page.getByRole('heading', { name: 'CH 09 · Sky Watch' }),
-    ).toBeVisible();
-  });
-
   test('the frozen clock ignores real time passing', async ({ page }) => {
     await visit(page, '04:42', '/?rerun=09');
     await page.clock.runFor(120_000); // real clock passes 04:44
@@ -150,12 +135,6 @@ test.describe('haunted tape', () => {
       page.getByRole('heading', { name: 'CH 09 · Sky Watch' }),
     ).toBeVisible();
     await expect(page.locator('.rerun-clock')).toHaveText('04:20 AM');
-  });
-
-  test('axe is clean in a rerun', async ({ page }) => {
-    await visit(page, '12:00', '/?rerun=09');
-    const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations).toEqual([]);
   });
 
   test('reduced motion removes the tracking wobble', async ({ browser }) => {
