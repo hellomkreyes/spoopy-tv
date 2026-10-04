@@ -19,25 +19,25 @@ beforeAll(() => useTz('America/Toronto'));
 afterEach(() => useTz('America/Toronto'));
 
 describe('state boundaries', () => {
-  it.each([
-    [[23, 59], 'off-air'],
-    [[0, 0], 'on-air'],
-    [[4, 42, 59], 'on-air'],
-    [[4, 43], 'sign-off'],
-    [[4, 44], 'off-air'],
-    [[4, 59], 'off-air'],
-  ])('%j is %s', ([h, m, s], expected) => {
-    expect(state(at(h, m, s))).toBe(expected);
+  it('is on air to 04:42:59, sign-off at 04:43, off air from 04:44 (incl. 04:59 and 23:59)', () => {
+    const rows = [
+      [[23, 59], 'off-air'],
+      [[0, 0], 'on-air'],
+      [[4, 42, 59], 'on-air'],
+      [[4, 43], 'sign-off'],
+      [[4, 44], 'off-air'],
+      [[4, 59], 'off-air'],
+    ];
+    for (const [[h, m, s], expected] of rows) {
+      expect(state(at(h, m, s)), `${h}:${m}:${s ?? 0}`).toBe(expected);
+    }
   });
 });
 
 describe('currentListing', () => {
-  it('cold-opens on CH 03 before the first listing', () => {
+  it('cold-opens on CH 03, switches at each start, holds, is null off air, and agrees with the rerun default', () => {
     expect(currentListing(at(0, 0)).ch).toBe('03');
     expect(currentListing(at(2, 59)).ch).toBe('03');
-  });
-
-  it('switches at each listing start, holds until the next, and is null off air', () => {
     for (const l of schedule.listings) {
       const [h, m] = l.start.split(':').map(Number);
       expect(currentListing(at(h, m)).ch).toBe(l.ch);
@@ -45,9 +45,6 @@ describe('currentListing', () => {
     expect(currentListing(at(3, 14)).ch).toBe('01');
     expect(currentListing(at(4, 42)).ch).toBe('09');
     expect(currentListing(at(4, 44))).toBeNull();
-  });
-
-  it('rerun clock and default channel agree', () => {
     const [h, m] = schedule.rerun.clock.split(':').map(Number);
     expect(currentListing(at(h, m)).ch).toBe(schedule.rerun.default);
   });
