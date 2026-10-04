@@ -12,11 +12,12 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:a11y": "playwright test",
-    "lint": "eslint . && prettier --check . && npm run lint:ja && npm run lint:fonts",
+    "lint": "eslint . && npm run lint:style",
     "lint:ja": "node scripts/extract-ja-copy.mjs && textlint build/ja-copy.txt",
     "format": "prettier --write .",
     "fonts": "node scripts/fonts.mjs",
-    "lint:fonts": "node scripts/fonts.mjs --check"
+    "lint:fonts": "node scripts/fonts.mjs --check",
+    "lint:style": "prettier --check . && npm run lint:ja && npm run lint:fonts"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
