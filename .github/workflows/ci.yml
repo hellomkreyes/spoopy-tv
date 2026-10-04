@@ -4,9 +4,17 @@ on:
     branches: [main]
   pull_request:
 
+# A newer push to the same PR makes the older run pointless.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  # The only check that should block merging. Deploy (deploy.yml) is separate and
+  # never waits on this.
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -14,8 +22,29 @@ jobs:
           node-version: lts/*
           cache: npm
       - run: npm ci
-      - run: npm run lint
+
+      # Advisory: these report a warning annotation but never fail the run.
+      # Formatting and copy style are cosmetic, and fonts fall back to system fonts.
+      - name: Prettier (advisory)
+        run: npx prettier --check . || echo "::warning title=Formatting::Run 'npm run format'"
+      - name: textlint on Japanese copy (advisory)
+        run: npm run lint:ja || echo "::warning title=Japanese copy::textlint found style issues; see this step's log"
+      - name: Font subsets (advisory)
+        run: npm run lint:fonts || echo "::warning title=Fonts::Run 'npm run fonts' and commit src/fonts"
+
+      # Blocking: real bugs, accessibility regressions, a broken build.
+      - run: npx eslint .
       - run: npm test
       - run: npm run build
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - run: npx playwright install --with-deps chromium
       - run: npm run test:a11y
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

@@ -6,6 +6,7 @@ describe('debounce', () => {
   afterEach(() => vi.useRealTimers());
 
   it('waits 500 ms after the last call and runs once with the last arguments', () => {
+    expect(ANNOUNCE_MS).toBe(500);
     const fn = vi.fn();
     const d = debounce(fn, ANNOUNCE_MS);
     d('ch 1');
@@ -19,9 +20,5 @@ describe('debounce', () => {
     vi.advanceTimersByTime(1);
     expect(fn).toHaveBeenCalledOnce();
     expect(fn).toHaveBeenCalledWith('ch 3');
-  });
-
-  it('is 500 ms', () => {
-    expect(ANNOUNCE_MS).toBe(500);
   });
 });

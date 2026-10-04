@@ -17,14 +17,6 @@
   },
   "rerun": {
     "bug": "RERUN",
-    "eject": "EJECT TAPE",
-    "channel": "CH {ch}",
-    "signOffChannel": "SIGN-OFF",
-    "placeholder": "Channel playback arrives in a later update. The tape rack and the frozen clock are live."
-  },
-  "live": {
-    "onAir": "ON AIR",
-    "signOff": "SIGN-OFF",
-    "placeholder": "The TV arrives in a later update."
+    "eject": "EJECT TAPE"
   }
 }

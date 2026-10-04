@@ -3,13 +3,18 @@
  *
  * Functions
  *   mountShell(root)  builds the page into `root`; returns
- *                     { screen, guide, led, setMode }
- *     screen         element views draw into (inside the CRT)
- *     guide          element the guide is drawn into
- *     led            the channel LED ({ set(ch, title) })
- *     setMode(mode)  'live' | 'off' | 'rerun': re-orders the layout and swaps the caption
+ *     screen        element channels and the test card draw into (inside the CRT)
+ *     overlay       element for the rerun bug and EJECT, above the screen
+ *     staticLayer   { layer, canvas, label } for the static burst (see fx.js)
+ *     crt           the CRT element (gets .is-off when powered down)
+ *     guide         element the guide is drawn into
+ *     led           the channel LED ({ set(ch, title) })
+ *     controls      { up, down, motion, power } buttons; the controller wires them
+ *     setMode(mode)       'live' | 'off' | 'rerun': re-orders the layout, swaps the caption
+ *     setMotionPaused(p)  MOTION button state (aria-pressed + icon)
+ *     setPowerOn(on)      POWER button state and the dark screen
  *
- * Gotcha: CH, MOTION and POWER start `disabled`; PR 4 (channelController) wires them up.
+ * Gotcha: layer order inside the CRT is screen < overlay < static < scanlines.
  */
 import { el, svg } from './dom.js';
 import { renderDefinition } from './definition.js';
@@ -28,6 +33,7 @@ const ICONS = {
       svg('rect', { x: 3, y: 3, width: 3.5, height: 10, class: 'fill' }),
       svg('rect', { x: 9.5, y: 3, width: 3.5, height: 10, class: 'fill' }),
     ),
+  play: () => icon(svg('polygon', { points: '4,3 13,8 4,13', class: 'fill' })),
   power: () =>
     icon(
       svg('path', { d: 'M8 2v6' }),
@@ -36,10 +42,10 @@ const ICONS = {
 };
 
 /** A control button. `text` is the visible label (hidden on mobile); `name` is the accessible name. */
-function control(iconName, text, name) {
+function control(iconName, text, name, extra = {}) {
   return el(
     'button',
-    { type: 'button', class: 'ctl', disabled: true },
+    { type: 'button', class: 'ctl', ...extra },
     ICONS[iconName](),
     el('span', { class: 'ctl-text', 'aria-hidden': 'true' }, text),
     el('span', { class: 'sr-only' }, name),
@@ -97,6 +103,36 @@ function footer() {
 export function mountShell(root) {
   const led = createLed();
   const screen = el('div', { class: 'crt-content', id: 'screen' });
+  const overlay = el('div', { class: 'crt-overlay' });
+  const canvas = el('canvas', { class: 'static-canvas' });
+  const label = el('span', { class: 'static-ch' });
+  const layer = el(
+    'div',
+    { class: 'static-layer', 'aria-hidden': 'true' },
+    canvas,
+    label,
+    el('span', { class: 'static-tuning' }, copy.static.tuning),
+  );
+  const crt = el(
+    'div',
+    { class: 'crt' },
+    screen,
+    overlay,
+    layer,
+    el('div', { class: 'crt-fx', 'aria-hidden': 'true' }),
+  );
+
+  const controls = {
+    up: control('up', copy.tv.chUp, copy.tv.chUpSr),
+    down: control('down', copy.tv.chDown, copy.tv.chDownSr),
+    motion: control('pause', copy.tv.motion, copy.tv.motion, {
+      'aria-pressed': 'false',
+    }),
+    power: control('power', copy.tv.power, copy.tv.power, {
+      'aria-pressed': 'true',
+    }),
+  };
+
   const wide = el('span', { class: 'cap-wide' });
   const narrow = el('span', { class: 'cap-narrow' });
   const caption = el('p', { class: 'tv-caption' }, wide, narrow);
@@ -108,20 +144,15 @@ export function mountShell(root) {
     el(
       'div',
       { class: 'tv-bezel' },
-      el(
-        'div',
-        { class: 'crt' },
-        screen,
-        el('div', { class: 'crt-fx', 'aria-hidden': 'true' }),
-      ),
+      crt,
       el(
         'div',
         { class: 'controls' },
         led.el,
-        control('up', copy.tv.chUp, copy.tv.chUpSr),
-        control('down', copy.tv.chDown, copy.tv.chDownSr),
-        control('pause', copy.tv.motion, copy.tv.motion),
-        control('power', copy.tv.power, copy.tv.power),
+        controls.up,
+        controls.down,
+        controls.motion,
+        controls.power,
         el('div', { class: 'grille', 'aria-hidden': 'true' }),
       ),
     ),
@@ -137,14 +168,30 @@ export function mountShell(root) {
   );
   root.append(header(), el('main', { class: 'site-main' }, layout), footer());
 
+  const swapIcon = (button, name) =>
+    button.querySelector('svg').replaceWith(ICONS[name]());
+
   return {
     screen,
+    overlay,
+    staticLayer: { layer, canvas, label },
+    crt,
     guide,
     led,
+    controls,
     setMode(mode) {
       layout.dataset.mode = mode;
-      caption.textContent =
-        mode === 'live' ? copy.captions.live : copy.captions.off;
+      const live = mode === 'live';
+      wide.textContent = live ? copy.captions.live : copy.captions.off;
+      narrow.textContent = live ? copy.captions.liveNarrow : copy.captions.off;
+    },
+    setMotionPaused(paused) {
+      controls.motion.setAttribute('aria-pressed', String(paused));
+      swapIcon(controls.motion, paused ? 'play' : 'pause');
+    },
+    setPowerOn(on) {
+      controls.power.setAttribute('aria-pressed', String(on));
+      crt.classList.toggle('is-off', !on);
     },
   };
 }

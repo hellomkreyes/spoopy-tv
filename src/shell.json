@@ -71,11 +71,17 @@
     "onAir": "ON AIR",
     "signOffLabel": "SIGN-OFF",
     "signalLostCh": "CH 00",
-    "signalLost": "signal lost"
+    "signalLost": "signal lost",
+    "tune": "Tune to"
   },
   "footer": {
     "left": "A CHIBI MUERE TRANSMISSION",
     "leftExtra": "BROADCASTING FROM TORONTO AFTER MIDNIGHT",
     "right": "MADE WITH GSAP · NO COOKIES · NO GHOSTS HARMED"
+  },
+  "static": {
+    "tuning": "受信中 · TUNING",
+    "channel": "CH {ch} ▶",
+    "signOff": "SIGN-OFF ▶"
   }
 }
