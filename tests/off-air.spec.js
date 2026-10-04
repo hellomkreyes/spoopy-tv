@@ -41,10 +41,12 @@ test.describe('off air', () => {
     await visit(page, '04:44');
     await expect(page.getByRole('heading', { name: 'OFF AIR' })).toBeVisible();
     await visit(page, '04:43');
-    await expect(page.getByRole('heading', { name: /SIGN-OFF/ })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /SIGN-OFF · Luna Pie/ }),
+    ).toBeVisible();
     await visit(page, '04:42');
     await expect(
-      page.getByRole('heading', { name: /ON AIR · CH 09/ }),
+      page.getByRole('heading', { name: 'CH 09 · Sky Watch' }),
     ).toBeVisible();
   });
 
@@ -57,9 +59,9 @@ test.describe('off air', () => {
 
   test('flips to on air at midnight without a reload', async ({ page }) => {
     await visit(page, '23:59');
-    await page.clock.runFor(61_000);
+    await page.clock.fastForward(61_000);
     await expect(
-      page.getByRole('heading', { name: /ON AIR · CH 03/ }),
+      page.getByRole('heading', { name: 'CH 03 · Emergency Alert' }),
     ).toBeVisible();
   });
 });
@@ -115,9 +117,11 @@ test.describe('haunted tape', () => {
     page,
   }) => {
     await visit(page, '12:00', '/?rerun=so');
-    await page.clock.runFor(59_000);
-    await expect(page.getByRole('heading', { name: /SIGN-OFF/ })).toBeVisible();
-    await page.clock.runFor(2000);
+    await page.clock.fastForward(59_000);
+    await expect(
+      page.getByRole('heading', { name: /SIGN-OFF · Luna Pie/ }),
+    ).toBeVisible();
+    await page.clock.fastForward(2000);
     await expect(page.getByRole('heading', { name: 'OFF AIR' })).toBeVisible();
     await expect(page).not.toHaveURL(/rerun/);
   });
@@ -130,7 +134,7 @@ test.describe('haunted tape', () => {
 
   test('the frozen clock ignores real time passing', async ({ page }) => {
     await visit(page, '04:42', '/?rerun=09');
-    await page.clock.runFor(120_000); // real clock passes 04:44
+    await page.clock.fastForward(120_000); // the real clock passes 04:44
     await expect(
       page.getByRole('heading', { name: 'CH 09 · Sky Watch' }),
     ).toBeVisible();
@@ -138,6 +142,8 @@ test.describe('haunted tape', () => {
   });
 
   test('reduced motion removes the tracking wobble', async ({ browser }) => {
+    // Add the entry class by hand so the CSS rule can be read deterministically
+    // (the real class clears itself when the 600 ms animation ends).
     const wobble = async (reducedMotion) => {
       const ctx = await browser.newContext({
         reducedMotion,
@@ -145,9 +151,10 @@ test.describe('haunted tape', () => {
       });
       const page = await ctx.newPage();
       await page.goto('/?rerun');
-      const name = await page
-        .locator('.rerun > .rerun-top')
-        .evaluate((n) => window.getComputedStyle(n).animationName);
+      const name = await page.locator('.crt-content').evaluate((n) => {
+        n.classList.add('is-tuning');
+        return window.getComputedStyle(n.firstElementChild).animationName;
+      });
       await ctx.close();
       return name;
     };
