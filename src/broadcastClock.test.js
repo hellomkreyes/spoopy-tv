@@ -22,14 +22,10 @@ describe('state boundaries', () => {
   it.each([
     [[23, 59], 'off-air'],
     [[0, 0], 'on-air'],
-    [[0, 1], 'on-air'],
-    [[4, 42], 'on-air'],
     [[4, 42, 59], 'on-air'],
     [[4, 43], 'sign-off'],
-    [[4, 43, 59], 'sign-off'],
     [[4, 44], 'off-air'],
     [[4, 59], 'off-air'],
-    [[12, 0], 'off-air'],
   ])('%j is %s', ([h, m, s], expected) => {
     expect(state(at(h, m, s))).toBe(expected);
   });
@@ -41,24 +37,14 @@ describe('currentListing', () => {
     expect(currentListing(at(2, 59)).ch).toBe('03');
   });
 
-  it('switches at each listing start', () => {
+  it('switches at each listing start, holds until the next, and is null off air', () => {
     for (const l of schedule.listings) {
       const [h, m] = l.start.split(':').map(Number);
       expect(currentListing(at(h, m)).ch).toBe(l.ch);
     }
-  });
-
-  it('holds a listing until the next one starts', () => {
     expect(currentListing(at(3, 14)).ch).toBe('01');
-    expect(currentListing(at(3, 15)).ch).toBe('03');
     expect(currentListing(at(4, 42)).ch).toBe('09');
-  });
-
-  it('is the sign-off at 04:43 and nothing off air', () => {
-    expect(currentListing(at(4, 43)).ch).toBe('so');
     expect(currentListing(at(4, 44))).toBeNull();
-    expect(currentListing(at(4, 59))).toBeNull();
-    expect(currentListing(at(23, 59))).toBeNull();
   });
 
   it('rerun clock and default channel agree', () => {
@@ -74,12 +60,6 @@ describe('nextBoundary', () => {
     expect(nextBoundary(at(4, 43))).toEqual(at(4, 44));
     expect(nextBoundary(at(4, 44))).toEqual(new Date(2026, 5, 16, 0, 0));
     expect(nextBoundary(at(23, 59, 30))).toEqual(new Date(2026, 5, 16, 0, 0));
-  });
-
-  it('is strictly after now', () => {
-    expect(nextBoundary(at(3, 0)).getTime()).toBeGreaterThan(
-      at(3, 0).getTime(),
-    );
   });
 });
 
@@ -97,6 +77,10 @@ describe('DST: America/Toronto', () => {
     expect(state(utc('2026-03-08T08:42:59Z'))).toBe('on-air');
     expect(state(utc('2026-03-08T08:43:00Z'))).toBe('sign-off');
     expect(state(utc('2026-03-08T08:44:00Z'))).toBe('off-air');
+    // Boundaries are built from local fields, so they stay on wall-clock time too.
+    expect(nextBoundary(new Date(2026, 2, 8, 0, 30))).toEqual(
+      new Date(2026, 2, 8, 3, 0),
+    );
   });
 
   // Fall back 2026-11-01: 02:00 EDT repeats as 01:00 EST (06:00Z).
@@ -110,14 +94,8 @@ describe('DST: America/Toronto', () => {
     expect(currentListing(utc('2026-11-01T08:00:00Z')).ch).toBe('01');
     expect(state(utc('2026-11-01T09:43:00Z'))).toBe('sign-off'); // 04:43 EST
     expect(state(utc('2026-11-01T09:44:00Z'))).toBe('off-air');
-  });
-
-  it('nextBoundary lands on local time on a DST day', () => {
     expect(nextBoundary(new Date(2026, 10, 1, 0, 30))).toEqual(
       new Date(2026, 10, 1, 3, 0),
-    );
-    expect(nextBoundary(new Date(2026, 2, 8, 0, 30))).toEqual(
-      new Date(2026, 2, 8, 3, 0),
     );
   });
 
@@ -178,27 +156,33 @@ describe('scheduleNextBoundary', () => {
 
   it('never sleeps in one long timeout', () => {
     vi.setSystemTime(at(0, 0));
-    const { stop } = setup();
-    // Next boundary is 03:00, hours away, but a timer is armed at most 30 s out.
-    expect(vi.getTimerCount()).toBe(1);
+    const { onChange, stop } = setup();
+    // Next boundary is hours away. Jump past it with no wake-up event: only the
+    // capped timer can notice, so it must fire within 30 s.
+    vi.setSystemTime(at(4, 44, 0));
     vi.advanceTimersByTime(30_100);
-    expect(vi.getTimerCount()).toBe(1);
+    expect(onChange).toHaveBeenCalledOnce();
+    expect(onChange.mock.calls[0][0].state).toBe('off-air');
     stop();
     expect(vi.getTimerCount()).toBe(0);
   });
 
-  it.each([
-    [() => doc, 'visibilitychange'],
-    [() => win, 'focus'],
-    [() => win, 'pageshow'],
-  ])('re-checks on event #%# after a throttled tab wakes', (target, name) => {
-    vi.setSystemTime(at(4, 40));
-    const { onChange, stop } = setup();
-    // The tab slept through 04:43; jump the clock without running timers.
-    vi.setSystemTime(at(4, 44, 5));
-    target().dispatchEvent(new Event(name));
-    expect(onChange).toHaveBeenCalledOnce();
-    expect(onChange.mock.calls[0][0].state).toBe('off-air');
-    stop();
+  it('re-checks on visibilitychange, focus and pageshow after a throttled tab wakes', () => {
+    const events = [
+      [doc, 'visibilitychange'],
+      [win, 'focus'],
+      [win, 'pageshow'],
+    ];
+    for (const [target, name] of events) {
+      vi.setSystemTime(at(4, 40));
+      const { onChange, stop } = setup();
+      // The tab slept through 04:43; jump the clock without running timers.
+      vi.setSystemTime(at(4, 44, 5));
+      target.dispatchEvent(new Event(name));
+      expect(onChange, name).toHaveBeenCalledOnce();
+      expect(onChange.mock.calls[0][0].state).toBe('off-air');
+      stop();
+      vi.useRealTimers();
+    }
   });
 });

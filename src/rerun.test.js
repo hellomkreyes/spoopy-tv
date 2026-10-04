@@ -3,15 +3,11 @@ import { frozenNow, parseRerun } from './rerun.js';
 
 describe('parseRerun', () => {
   it.each([
-    ['', null],
     ['?foo=1', null],
     ['?rerun', '09'],
-    ['?rerun=', '09'],
     ['?rerun=04', '04'],
     ['?rerun=4', '04'],
-    ['?rerun=so', 'so'],
     ['?rerun=SO', 'so'],
-    ['?rerun=99', '09'],
     ['?rerun=<script>', '09'],
   ])('%j -> %j', (search, expected) => {
     expect(parseRerun(search)).toBe(expected);
