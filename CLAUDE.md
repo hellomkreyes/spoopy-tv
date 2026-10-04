@@ -6,15 +6,22 @@ A haunted CRT you channel-flip, on air only 00:00–04:44 on the visitor's devic
 - MK is the design eye and manager; you are the engineer. **Propose a short plan and wait for approval before big changes** (new modules, architecture, dependencies, anything touching more than ~5 files).
 - One PR per step in the PR breakdown in `docs/PLAN.md`. One branch per PR (`pr-02-broadcast-clock`). Small commits. Don't start the next PR unprompted.
 - Match the mocks. If you want to deviate for technical or accessibility reasons, say so and ask.
-- Keep copy in JSON (`chNN.json`, `schedule.json`), never hard-coded in markup. Japanese copy gets a native-speaker review before launch, so don't invent folklore details.
+- Keep copy in JSON (`chNN.json`, `schedule.json`), never hard-coded in markup. The hybrid copy (Japanese readings, Tagalog lines, Baybayin spellings) is reviewed by MK before launch, so don't invent folklore details.
+
+## Hybrid direction (Japanese + Filipino), decided 2026-10-04
+- CH 04 (Hipnosis) and CH 06 (Payo ng 3AM) are Tagalog; CH 04 shows an English line under every Tagalog line. CH 01, 03, 07, 09 and CH 00 stay Japanese. See the table in `docs/PLAN.md`.
+- Every channel gets one big decorative Baybayin word (bakunawa, babala, titigan/kulam, kulam/albularyo/mangkukulam, aswang, santelmo, sumpa). Baybayin is real Unicode (U+1700–171F) in Noto Sans Tagalog, self-hosted subset. It is **decoration only**: wrap it in `role="img"` with `lang="tl-Tglg"` and an English `aria-label`; never put meaning only in Baybayin.
+- Folklore sources: Wikipedia "Witchcraft in the Philippines" and the Aswang Project. Don't invent folklore details; flag anything uncertain in the copy sheet. Portray albularyo as healers.
+- textlint covers the Japanese strings only. Tagalog copy is reviewed by MK.
+- Mock PNGs use a fallback font, so Baybayin looks blocky there; the live canvas shows the real glyphs.
 
 ## Stack
 - Vite + plain ES modules. No framework. Node LTS, `npm ci` in CI.
 - GSAP core + SplitText + DrawSVGPlugin. **Pin the exact version** (lockfile). Register plugins once in `src/motion.js`. Always create animations inside `gsap.context()` and `revert()` on exit.
-- Fonts: Dela Gothic One, DotGothic16, Zen Kaku Gothic New. **Self-host subsets** (no Google Fonts requests at runtime). `await document.fonts.ready` before any SplitText.
-- Hosting: GitHub Pages, CNAME `tv.chibimuere.com`. No custom headers, so CSP goes in a `<meta>` tag. No cookies, no analytics, no audio in v1.
+- Fonts: Dela Gothic One, DotGothic16, Zen Kaku Gothic New, Noto Sans Tagalog (Baybayin). **Self-host subsets** (no Google Fonts requests at runtime). `await document.fonts.ready` before any SplitText.
+- Hosting: GitHub Pages, CNAME `tv.chibimuere.com`. No custom headers, so CSP goes in a `<meta>` tag. No cookies, no analytics. Audio is opt-in only (PR 12).
 - Tests: Playwright (clock + timezone control) + axe-core. Unit tests for `broadcastClock`.
-- Japanese copy: textlint with `textlint-rule-preset-ja-technical-writing` in CI. textlint can't read JSON, so `scripts/extract-ja-copy.mjs` extracts every Japanese string from `chNN.json` and `schedule.json` into one text file (one string per line) that textlint lints. Turn off preset rules that don't suit short display titles in `.textlintrc.json`, with a comment saying why. It doesn't replace the native-speaker review.
+- Japanese copy: textlint with `textlint-rule-preset-ja-technical-writing` in CI. textlint can't read JSON, so `scripts/extract-ja-copy.mjs` extracts every Japanese string from `chNN.json` and `schedule.json` into one text file (one string per line) that textlint lints. Turn off preset rules that don't suit short display titles in `.textlintrc.json`, with a comment saying why. MK reviews the copy sheet before launch.
 
 ## Architecture rules
 - `src/broadcastClock.js` decides what is on air; `src/channelController.js` decides how the screen changes. Everything else feeds them or is driven by them.
@@ -26,7 +33,8 @@ A haunted CRT you channel-flip, on air only 00:00–04:44 on the visitor's devic
 - Off-air screen has one real button, drawn as a VHS tape: "PLAY THE HAUNTED TAPE · 04:20 AM". It starts a rerun with the clock frozen at 04:20 (Sky Watch on air by default), a RERUN bug, and a tracking wobble on entry. While off air the TV guide becomes a tape rack: every listing, including the 04:43 Luna Pie sign-off, has its own ▶ button (`?rerun=04`, `?rerun=so`; plain `?rerun` = Sky Watch). The frozen clock only pins the guide and on-screen time; channel loops run from tape start. When the sign-off ends, the tape ejects to the off-air card. Definition card (怪電波) and guide stay visible off air. The Haunted Tape (rerun mode) is separate from the Cursed Tape (CH 00, Konami).
 - Konami: keyboard ↑↑↓↓←→←→ B A; touch = swipes ↑↑↓↓←→←→ then two taps on the LED. Vertical swipes also flip channels, so count gestures separately from flips (flips still obey the 3/sec cap).
 - Cursed Tape (CH 00): starts with 13:00 of tape, burns only while CH 00 is watched, never refills on its own. At zero it shows the spent-tape card with a real button, UNCURSE THE TAPE, which refills it to 13:00. State in `localStorage` (try/catch). See `docs/mocks/ch00-cursed-tape.png` and `ch00-tape-spent-uncurse.png`.
-- No audio in v1. v2 audio uses the Web Audio API directly (no library): one `audio.js`, dynamically imported when SOUND is first pressed; create/resume the `AudioContext` only inside that click; sources → bus `GainNode`s → master gain (~-18 dB) → `DynamicsCompressorNode` → destination; synthesize the hum (60 Hz + harmonics), static (filtered noise buffer), blips (oscillator + envelope) and a drone (detuned saws + low-pass + LFO); subscribe to controller events, never call audio from channels; `suspend()` on hidden tab/power off; off by default, no autoplay, never rely on sound alone (WCAG 1.4.2). Licence options are in `docs/PLAN.md`, Audio (v2).
+- Audio ships in v1 as an opt-in (PR 12) and uses the Web Audio API directly (no library): one `audio.js`, dynamically imported when SOUND is first pressed; create/resume the `AudioContext` only inside that click; sources → bus `GainNode`s → master gain (~-18 dB) → `DynamicsCompressorNode` → destination; synthesize the hum (60 Hz + harmonics), static (filtered noise buffer), blips (oscillator + envelope) and a drone (detuned saws + low-pass + LFO); subscribe to controller events, never call audio from channels; `suspend()` on hidden tab/power off; off by default, no autoplay, never rely on sound alone (WCAG 1.4.2). Licence options are in `docs/PLAN.md`, Audio (v2).
+- Cylinder clips (UCSB Cylinder Audio Archive): pre-1923 recordings only, date confirmed per clip; free MP3s trimmed to short mono loops (≤ 250 KB), self-hosted in `public/audio/`, never hotlinked; one `src/audio/credits.json` entry per clip (title, performer, label/number, year, archive URL, licence) shown in a credits panel; screen out any clip with racist lyrics or caricature. Off by default, visible mute/pause, never autoplay.
 
 ## Accessibility rules (non-negotiable, enforced in tests)
 - WCAG 2.3.1: at most 3 cuts per second. The channel-flip queue is capped at 3/sec; holding an arrow key must never exceed it. Static frames are levelled to the same average brightness (±8%). No full-screen swap to saturated red.

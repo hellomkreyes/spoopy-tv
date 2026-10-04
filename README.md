@@ -34,7 +34,7 @@ Off air, the page offers the Haunted Tape, a rerun frozen at 04:20 (🫣). Share
 - One 2D canvas for static
 - Self-hosted font subsets
 - No cookies, no analytics, 
-- No audio in v1
+- Audio is opt-in: off by default, with a SOUND button
 - Hosted on GitHub Pages @ [https://tv.chibimuere.com](https://tv.chibimuere.com)
 
 ## Develop
@@ -54,7 +54,7 @@ npm run dev
 | `npm run test:a11y`    | Playwright + axe-core                                     |
 | `npm run lint`         | ESLint, Prettier check, and textlint on the Japanese copy |
 
-Japanese copy is linted by extracting every Japanese string from the JSON files and running textlint on the result. That catches typos and style slips but doesn't replace a native-speaker review.
+Japanese copy is linted by extracting every Japanese string from the JSON files and running textlint on the result. That catches typos and style slips; MK reviews the copy before launch.
 
 ## Accessibility
 
