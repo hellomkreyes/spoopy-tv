@@ -11,6 +11,8 @@
  *     play(ch), eject()   put a tape in / take it out
  *     togglePower(), togglePaused()
  *     subscribe(fn)       fn({ mode, ch, tape, power }) after each change
+ *     events.tune(fn), events.staticStart(fn), events.staticEnd(fn),
+ *     events.power(fn), events.signOff(fn), events.pause(fn), events.resume(fn)
  *     debug               test hooks (cut log, timeline count, progress)
  *
  * Modes: 'live' (on air), 'off' (test card), 'rerun' (a tape in the deck).
@@ -23,6 +25,7 @@
  *   - No static burst under reduced motion or while paused: a hard cut. Reduced motion
  *     holds every channel on its designed still frame (stillAt).
  *   - Clock changes (midnight, 04:43, 04:44) re-tune on air; a tape in the deck is left alone.
+ *   - tune event includes { ch, lang } where lang is 'ja' or 'tl' (Tagalog).
  */
 import { loadChannel } from './channels/index.js';
 import { createFlipQueue } from './flipQueue.js';
@@ -46,6 +49,18 @@ const CUT_LOG_MAX = 200;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Per-channel language (Japanese vs Tagalog) for hybrid direction
+const CHANNEL_LANGS = {
+  '00': 'ja',
+  '01': 'ja',
+  '03': 'ja',
+  '04': 'tl',
+  '06': 'tl',
+  '07': 'ja',
+  '09': 'ja',
+  so: 'ja',
+};
+
 export function createController({ shell, fx }) {
   const store = {
     power: true,
@@ -62,6 +77,15 @@ export function createController({ shell, fx }) {
   let guideKey = '';
   let chain = Promise.resolve();
   const subscribers = new Set();
+  const eventSubscribers = {
+    tune: new Set(),
+    staticStart: new Set(),
+    staticEnd: new Set(),
+    power: new Set(),
+    signOff: new Set(),
+    pause: new Set(),
+    resume: new Set(),
+  };
 
   const debug = {
     cuts: [],
@@ -85,6 +109,10 @@ export function createController({ shell, fx }) {
         power: store.power,
       }),
     );
+
+  const emit = (event, payload) => {
+    eventSubscribers[event]?.forEach((fn) => fn(payload));
+  };
 
   // ---- clock sync -------------------------------------------------------
 
@@ -217,6 +245,7 @@ export function createController({ shell, fx }) {
     updateControls();
 
     if (useBurst) {
+      emit('staticStart', {});
       shell.staticLayer.label.textContent = !next.ch
         ? ''
         : next.ch === 'so'
@@ -224,11 +253,15 @@ export function createController({ shell, fx }) {
           : fill(copy.static.channel, { ch: next.ch });
       await wait(EXIT_MS);
       await fx.burst(BURST_MS);
+      emit('staticEnd', {});
     }
     if (!store.power) return;
 
     await mount(next);
     shown = true;
+    if (next.ch === 'so') {
+      emit('signOff', {});
+    }
     notify();
     if (focus) shell.screen.querySelector('[data-focus]')?.focus();
   }
@@ -240,6 +273,8 @@ export function createController({ shell, fx }) {
     if (action.type === 'play') {
       store.tape = action.ch;
       store.tapeStart = Date.now();
+      const lang = CHANNEL_LANGS[action.ch];
+      emit('tune', { ch: action.ch, lang });
       return transition(target(), { focus: true });
     }
     if (action.type === 'eject') {
@@ -261,6 +296,8 @@ export function createController({ shell, fx }) {
     } else {
       store.liveCh = ch;
     }
+    const lang = CHANNEL_LANGS[ch];
+    emit('tune', { ch, lang });
     return transition(target());
   }
 
@@ -276,6 +313,7 @@ export function createController({ shell, fx }) {
   function togglePower() {
     return run(async () => {
       store.power = !store.power;
+      emit('power', { on: store.power });
       shell.setPowerOn(store.power);
       if (store.power) return transition(target());
       queue.clear();
@@ -312,16 +350,54 @@ export function createController({ shell, fx }) {
     shell.controls.down.addEventListener('click', () => flip(-1));
     shell.controls.motion.addEventListener('click', togglePaused);
     shell.controls.power.addEventListener('click', togglePower);
+    let wasPaused = false;
     onMotionChange(({ paused, reduced }) => {
       shell.setMotionPaused(paused);
       // While paused, keep the frozen frame; re-sync to the clock on resume.
       if (!paused || reduced) applyMotion();
+      if (paused && !wasPaused) {
+        emit('pause', {});
+      } else if (!paused && wasPaused) {
+        emit('resume', {});
+      }
+      wasPaused = paused;
     });
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && !isPaused()) applyMotion();
     });
     return run(() => transition(target(), { burst: false }));
   }
+
+  const events = {
+    tune: (fn) => {
+      eventSubscribers.tune.add(fn);
+      return () => eventSubscribers.tune.delete(fn);
+    },
+    staticStart: (fn) => {
+      eventSubscribers.staticStart.add(fn);
+      return () => eventSubscribers.staticStart.delete(fn);
+    },
+    staticEnd: (fn) => {
+      eventSubscribers.staticEnd.add(fn);
+      return () => eventSubscribers.staticEnd.delete(fn);
+    },
+    power: (fn) => {
+      eventSubscribers.power.add(fn);
+      return () => eventSubscribers.power.delete(fn);
+    },
+    signOff: (fn) => {
+      eventSubscribers.signOff.add(fn);
+      return () => eventSubscribers.signOff.delete(fn);
+    },
+    pause: (fn) => {
+      eventSubscribers.pause.add(fn);
+      return () => eventSubscribers.pause.delete(fn);
+    },
+    resume: (fn) => {
+      eventSubscribers.resume.add(fn);
+      return () => eventSubscribers.resume.delete(fn);
+    },
+  };
 
   return {
     init,
@@ -336,6 +412,7 @@ export function createController({ shell, fx }) {
       subscribers.add(fn);
       return () => subscribers.delete(fn);
     },
+    events,
     debug,
   };
 }
