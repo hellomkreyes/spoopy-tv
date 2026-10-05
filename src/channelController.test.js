@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock window and document before importing controller
 vi.stubGlobal('window', {
-  matchMedia: () => ({ matches: false, addListener: vi.fn(), removeListener: vi.fn() }),
+  matchMedia: () => ({
+    matches: false,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+  }),
 });
 
 vi.stubGlobal('document', {
@@ -14,7 +18,7 @@ vi.stubGlobal('document', {
 // Mock motion.js
 vi.mock('./motion.js', () => ({
   gsap: {
-    context: vi.fn((fn, el) => {
+    context: vi.fn((fn) => {
       const ctx = { revert: vi.fn() };
       fn();
       return ctx;
