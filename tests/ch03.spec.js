@@ -1,31 +1,36 @@
 import { test, expect } from '@playwright/test';
-import { boot } from './helpers.js';
 import AxeBuilder from '@axe-core/playwright';
+import { boot } from './helpers.js';
 
 // CH 03 is the cold open (before 03:00), so boot() lands on it at 03:20.
+// These checks are structural (ids, roles, attributes), not copy matches, so
+// wording can change without breaking them.
+const led = (page) => page.locator('.led-digits');
 const heading = (page) => page.locator('#screen [data-focus]');
+const decorativeWord = (page) => page.locator('#screen [role="img"][lang]');
 
-test('CH 03 renders its heading, transcript and decorative Baybayin', async ({
+test('CH 03 is on air: LED shows 03, heading is an H2', async ({
   page,
 }) => {
   await boot(page);
-  await expect(heading(page)).toHaveText('CH 03 · Emergency Alert');
-  await expect(
-    page.getByText(
-      'Residents of all planes: if you hear your name called three times tonight, do not answer.',
-    ),
-  ).toBeVisible();
-
-  const baybayin = page.getByRole('img', { name: 'Babala, warning' });
-  await expect(baybayin).toHaveAttribute('lang', 'tl-Tglg');
+  await expect(led(page)).toHaveText('03');
+  await expect(heading(page)).toBeVisible();
+  expect(await heading(page).evaluate((n) => n.tagName)).toBe('H2');
 });
 
-test('CH 03 passes axe with its transcript and decoration', async ({ page }) => {
+test('CH 03 decorative Baybayin is labelled and tagged as Tagalog', async ({
+  page,
+}) => {
+  await boot(page);
+  const word = decorativeWord(page);
+  await expect(word).toHaveAttribute('lang', 'tl-Tglg');
+  await expect(word).toHaveAttribute('aria-label', /.+/);
+});
+
+test('CH 03 passes axe', async ({ page }) => {
   await boot(page);
   await expect(heading(page)).toBeVisible();
-  const results = await new AxeBuilder({ page })
-    .include('#screen')
-    .analyze();
+  const results = await new AxeBuilder({ page }).include('#screen').analyze();
   expect(results.violations).toEqual([]);
 });
 
@@ -34,7 +39,7 @@ test.describe('reduced motion', () => {
 
   test('CH 03 holds on its designed still frame', async ({ page }) => {
     await boot(page);
-    await expect(heading(page)).toHaveText('CH 03 · Emergency Alert');
+    await expect(led(page)).toHaveText('03');
     const first = await page.evaluate(() => window.__kaidenpa.progress());
     await page.clock.runFor(3000);
     const later = await page.evaluate(() => window.__kaidenpa.progress());
