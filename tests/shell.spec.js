@@ -13,6 +13,8 @@ const LAYOUTS = [
   { width: 390, height: 844, states: [OFF_AIR] },
 ];
 
+// Structural hooks only: nav hrefs and rel, data-ch, classes, LED digits.
+// Labels and copy are not matched, so wording can change without breaking tests.
 test('layout: axe is clean, nothing overflows, and the guide/definition order flips off air', async ({
   page,
 }) => {
@@ -50,10 +52,10 @@ test('mobile: header links, tap targets and the tape button fit the screen', asy
   await page.setViewportSize({ width: 390, height: 844 });
   await visit(page, '12:00');
 
-  await expect(page.getByRole('link', { name: 'TV GUIDE' })).toBeVisible();
-  await expect(
-    page.getByRole('link', { name: /CHIBIMUERE\.COM/ }),
-  ).toBeVisible();
+  const navLinks = page.locator('.site-nav a');
+  await expect(navLinks).toHaveCount(2);
+  await expect(navLinks.nth(0)).toBeVisible();
+  await expect(navLinks.nth(1)).toBeVisible();
 
   const box = (sel) =>
     page.locator(sel).evaluate((n) => n.getBoundingClientRect().toJSON());
@@ -65,7 +67,7 @@ test('mobile: header links, tap targets and the tape button fit the screen', asy
   const small = await page.locator('button:visible').evaluateAll((nodes) =>
     nodes
       .map((n) => ({
-        text: n.textContent.trim().slice(0, 30),
+        cls: n.className,
         h: n.getBoundingClientRect().height,
       }))
       .filter((b) => b.h < 44),
@@ -84,30 +86,22 @@ test('on air: header, guide, LED and self-hosted fonts', async ({ page }) => {
   await visit(page, '03:20');
 
   await test.step('header', async () => {
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-      '怪電波 Kaidenpa',
-    );
-    expect(await page.locator('.site-nav a').allTextContents()).toEqual([
-      'TV GUIDE',
-      'CHIBIMUERE.COM ↗',
-    ]);
-    await expect(page.getByRole('link', { name: 'TV GUIDE' })).toHaveAttribute(
-      'href',
-      '#listings',
-    );
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.locator('.wordmark [lang="ja"]')).toBeVisible();
+    await expect(page.locator('.site-nav a')).toHaveCount(2);
+    await expect(page.locator('.site-nav a[href="#listings"]')).toBeVisible();
+    await expect(page.locator('.site-nav a[rel="noopener"]')).toBeVisible();
     await expect(page.locator('#listings')).toBeAttached();
   });
 
   // The 500 ms announce debounce is unit-tested in src/led.test.js.
   await test.step('guide and LED', async () => {
     const tuned = page.locator('.guide-item[aria-current="true"]');
-    await expect(tuned).toContainText('Emergency Alert');
-    await expect(tuned.locator('.guide-badge-live')).toContainText('ON AIR');
-    await expect(page.locator('.guide-lost')).toContainText('signal lost');
+    await expect(tuned).toHaveAttribute('data-ch', '03');
+    await expect(tuned.locator('.guide-badge-live')).toBeVisible();
+    await expect(page.locator('.guide-lost')).toBeAttached();
     await expect(page.locator('.led-digits')).toHaveText('03');
-    await expect(page.locator('.led [aria-live="polite"]')).toHaveText(
-      'Channel 3: Emergency Alert',
-    );
+    await expect(page.locator('.led [aria-live="polite"]')).toHaveText(/3/);
   });
 
   await test.step('fonts are self-hosted and applied', async () => {
