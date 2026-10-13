@@ -1,6 +1,6 @@
 # 怪電波 Kaidenpa (tv.chibimuere.com)
 
-A haunted CRT you channel-flip, on air only 00:00–04:44 on the visitor's device clock (04:44 is the mirror hour). Visual inspiration only; no copied characters, song or credit layouts. Full plan: `docs/PLAN.md`. Mocks: `docs/mocks/` (Main/Mobile UI, Off Air + Haunted Tape, Static, and every channel). Project: Kaidenpa (怪電波). Repo: `hellomkreyes/spoopy-tv` (repo name only; the project is still called Kaidenpa).
+A haunted CRT you channel-flip, on air only 00:00–04:44 on the visitor's device clock (04:44 is the mirror hour). Visual inspiration only; no copied characters, song or credit layouts. Full plan: `docs/PLAN.md`. Tokens, type and motion budget: `DESIGN.md`. Mocks: `docs/mocks/` (Main/Mobile UI, Off Air + Haunted Tape, Static, and every channel). Project: Kaidenpa (怪電波). Repo: `hellomkreyes/spoopy-tv` (repo name only; the project is still called Kaidenpa).
 
 ## How we work
 - MK is the design eye and manager; you are the engineer. **Propose a short plan and wait for approval before big changes** (new modules, architecture, dependencies, anything touching more than ~5 files).
