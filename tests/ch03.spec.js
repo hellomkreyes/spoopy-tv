@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { boot } from './helpers.js';
+import { boot, visit } from './helpers.js';
 
 // CH 03 is the cold open (before 03:00), so boot() lands on it at 03:20.
 // These checks are structural (ids, roles, attributes), not copy matches, so
@@ -28,7 +28,8 @@ test('CH 03 decorative Baybayin is labelled and tagged as Tagalog', async ({
 });
 
 test('CH 03 passes axe', async ({ page }) => {
-  await boot(page);
+  // Not boot(): it pauses the fake clock, and axe waits on timers, so it would hang.
+  await visit(page, '03:20');
   await expect(heading(page)).toBeVisible();
   const results = await new AxeBuilder({ page }).include('#screen').analyze();
   expect(results.violations).toEqual([]);
