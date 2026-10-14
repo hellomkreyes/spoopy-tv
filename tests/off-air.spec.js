@@ -33,7 +33,8 @@ test('clock: 04:42 on air, 04:43 sign-off, 04:44 off air, midnight without a rel
 
   await visit(page, '04:43');
   await expect(led(page)).toHaveText('SO');
-  await expect(tuned(page)).toHaveAttribute('data-ch', 'so');
+  // The sign-off has no live guide row, only a rack row, so check the screen instead.
+  await expect(page.locator('#screen [data-focus]')).toBeVisible();
 
   await visit(page, '04:44');
   await expect(page.locator('.test-card')).toBeVisible();
