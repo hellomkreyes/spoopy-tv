@@ -1,8 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { boot } from './helpers.js';
 
+// Structural hooks only: LED digits, data-ch, data-ctl, data-focus, classes and
+// aria state. Button labels and channel titles are copy, so they are not matched.
 const led = (page) => page.locator('.led-digits');
 const heading = (page) => page.locator('#screen [data-focus]');
+const ctl = (page, name) => page.locator(`[data-ctl="${name}"]`);
+const guideRow = (page, ch) => page.locator(`.guide-item-live[data-ch="${ch}"]`);
+const tuned = (page) => page.locator('.guide-item[aria-current="true"]');
 const hook = (page, fn) => page.evaluate((f) => window.__kaidenpa[f](), fn);
 const cuts = (page) => page.evaluate(() => window.__kaidenpa.cuts);
 // Let a channel change (40 ms cut + 280 ms static) finish.
@@ -44,7 +49,7 @@ test('tuning: arrows, digits, CH buttons, guide rows and swipe', async ({
     await page.keyboard.press('9');
     await settle(page);
     await expect(led(page)).toHaveText('09');
-    await expect(heading(page)).toHaveText('CH 09 · Sky Watch');
+    await expect(heading(page)).toBeVisible();
     for (const key of ['2', '0']) {
       await page.keyboard.press(key);
       await settle(page);
@@ -53,25 +58,21 @@ test('tuning: arrows, digits, CH buttons, guide rows and swipe', async ({
   });
 
   await test.step('CH button wraps around', async () => {
-    await page.getByRole('button', { name: 'Channel up' }).click();
+    await ctl(page, 'up').click();
     await settle(page);
     await expect(led(page)).toHaveText('01');
   });
 
   await test.step('a guide row tunes; ON AIR stays with the clock', async () => {
-    const row = page.getByRole('button', { name: /Tune to.*Shadow Play/ });
+    const row = guideRow(page, '07');
     await row.click();
     await settle(page);
     await expect(led(page)).toHaveText('07');
-    await expect(
-      page.locator('.guide-item[aria-current="true"]'),
-    ).toContainText('Shadow Play');
+    await expect(tuned(page)).toHaveAttribute('data-ch', '07');
     await expect(
       page.locator('.guide-item:has(.guide-badge-live)'),
-    ).toContainText('Emergency Alert');
-    await expect(
-      page.getByRole('button', { name: /Tune to.*Shadow Play/ }),
-    ).toBeFocused(); // focus survives the re-render
+    ).toHaveAttribute('data-ch', '03');
+    await expect(guideRow(page, '07')).toBeFocused(); // focus survives the re-render
   });
 
   await test.step('a vertical swipe up on the screen changes channel up', async () => {
@@ -98,10 +99,7 @@ test('Space pauses everything and resumes in sync', async ({ page }) => {
   await page.clock.runFor(1000);
   await page.keyboard.press('Space');
   await expect(page.locator('html')).toHaveClass(/is-paused/);
-  await expect(page.getByRole('button', { name: 'MOTION' })).toHaveAttribute(
-    'aria-pressed',
-    'true',
-  );
+  await expect(ctl(page, 'motion')).toHaveAttribute('aria-pressed', 'true');
   const frozen = await hook(page, 'progress');
   await page.clock.runFor(2000);
   expect(await hook(page, 'progress')).toBe(frozen);
@@ -134,19 +132,18 @@ test('POWER blanks the screen and brings the channel back', async ({
   page,
 }) => {
   await boot(page);
-  const power = page.getByRole('button', { name: 'POWER' });
+  const power = ctl(page, 'power');
   await power.click();
   await expect(page.locator('.crt')).toHaveClass(/is-off/);
   await expect(led(page)).toHaveText('– –');
   await expect(page.locator('#screen > *')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Channel up' })).toBeDisabled();
-  await expect(
-    page.getByRole('button', { name: /Tune to/ }).first(),
-  ).toBeDisabled();
+  await expect(ctl(page, 'up')).toBeDisabled();
+  await expect(page.locator('.guide-item-live').first()).toBeDisabled();
   await power.click();
   await settle(page);
   await expect(page.locator('.crt')).not.toHaveClass(/is-off/);
-  await expect(heading(page)).toHaveText('CH 03 · Emergency Alert');
+  await expect(led(page)).toHaveText('03');
+  await expect(heading(page)).toBeVisible();
 });
 
 test('50 flips leave no extra timelines or channel elements behind', async ({
@@ -171,13 +168,11 @@ test('tapes: CH is disabled with none in the deck, and flips between tapes in a 
   page,
 }) => {
   await boot(page, '12:00:00');
-  await expect(page.getByRole('button', { name: 'Channel up' })).toBeDisabled();
-  await expect(
-    page.getByRole('button', { name: 'Channel down' }),
-  ).toBeDisabled();
+  await expect(ctl(page, 'up')).toBeDisabled();
+  await expect(ctl(page, 'down')).toBeDisabled();
 
   await boot(page, '12:00:00', '/?rerun=09');
-  await page.getByRole('button', { name: 'Channel up' }).click();
+  await ctl(page, 'up').click();
   await settle(page);
   await expect(led(page)).toHaveText('SO'); // the sign-off is a tape too
   await expect(page).toHaveURL(/\?rerun=so$/);

@@ -1,20 +1,23 @@
 import { test, expect } from '@playwright/test';
 import { visit } from './helpers.js';
 
-const heading = (page, name) => page.getByRole('heading', { name });
+// Structural hooks only (classes, data-ch, data-focus, LED digits). Headings,
+// button labels and on-screen text are copy, so they are not matched here.
+const title = (page) => page.locator('#screen [data-focus]');
+const tuned = (page) => page.locator('.guide-item[aria-current="true"]');
+const led = (page) => page.locator('.led-digits');
 
 test('off air: test card, ticking countdown, tape rack and LED', async ({
   page,
 }) => {
   const errors = await visit(page, '12:00');
-  await expect(heading(page, 'OFF AIR')).toBeVisible();
-  await expect(page.getByText('Broadcast resumes at 00:00')).toBeAttached();
-  await expect(
-    page.getByRole('button', { name: /PLAY THE HAUNTED TAPE · 04:20 AM/ }),
-  ).toBeVisible();
+  await expect(page.locator('.test-card')).toBeVisible();
+  await expect(title(page)).toBeVisible();
+  await expect(page.locator('.view-count')).toBeAttached();
+  await expect(page.locator('.tape')).toBeVisible();
   await expect(page.locator('.guide-item')).toHaveCount(7);
-  await expect(page.locator('.led-digits')).toHaveText('– –');
-  await expect(page.locator('.led [aria-live="polite"]')).toHaveText('Off air');
+  await expect(led(page)).toHaveText('– –');
+  await expect(page.locator('.led [aria-live="polite"]')).not.toBeEmpty();
   await expect(page.locator('.countdown')).toHaveText('12:00:00');
   await page.clock.runFor(5000);
   await expect(page.locator('.countdown')).toHaveText('11:59:55');
@@ -25,32 +28,38 @@ test('clock: 04:42 on air, 04:43 sign-off, 04:44 off air, midnight without a rel
   page,
 }) => {
   await visit(page, '04:42');
-  await expect(heading(page, 'CH 09 · Sky Watch')).toBeVisible();
+  await expect(led(page)).toHaveText('09');
+  await expect(tuned(page)).toHaveAttribute('data-ch', '09');
+
   await visit(page, '04:43');
-  await expect(heading(page, /SIGN-OFF · Luna Pie/)).toBeVisible();
+  await expect(led(page)).toHaveText('SO');
+  // The sign-off has no live guide row, only a rack row, so check the screen instead.
+  await expect(page.locator('#screen [data-focus]')).toBeVisible();
+
   await visit(page, '04:44');
-  await expect(heading(page, 'OFF AIR')).toBeVisible();
+  await expect(page.locator('.test-card')).toBeVisible();
+  await expect(led(page)).toHaveText('– –');
 
   await visit(page, '23:59');
   await page.clock.fastForward(61_000);
-  await expect(heading(page, 'CH 03 · Emergency Alert')).toBeVisible();
+  await expect(led(page)).toHaveText('03');
+  await expect(tuned(page)).toHaveAttribute('data-ch', '03');
 });
 
 test('tape: the button plays Sky Watch at a frozen 04:20, EJECT returns to the card', async ({
   page,
 }) => {
   await visit(page, '12:00');
-  await page.getByRole('button', { name: /PLAY THE HAUNTED TAPE/ }).click();
-  await expect(heading(page, 'CH 09 · Sky Watch')).toBeFocused();
-  await expect(page.locator('.rerun-bug')).toHaveText('● RERUN');
+  await page.locator('.tape').click();
+  await expect(title(page)).toBeFocused();
+  await expect(led(page)).toHaveText('09');
+  await expect(page.locator('.rerun-bug')).toHaveText(/\S/);
   await expect(page.locator('.rerun-clock')).toHaveText('04:20 AM');
   await expect(page).toHaveURL(/\?rerun=09$/);
-  await expect(page.locator('.guide-item[aria-current="true"]')).toContainText(
-    'Sky Watch',
-  );
+  await expect(tuned(page)).toHaveAttribute('data-ch', '09');
 
-  await page.getByRole('button', { name: 'EJECT TAPE' }).click();
-  await expect(heading(page, 'OFF AIR')).toBeVisible();
+  await page.locator('.eject').click();
+  await expect(page.locator('.test-card')).toBeVisible();
   await expect(page).not.toHaveURL(/rerun/);
 });
 
@@ -58,15 +67,15 @@ test('rerun links and rack rows: plain, numbered, sign-off, any hour', async ({
   page,
 }) => {
   await visit(page, '01:00', '/?rerun'); // plain ?rerun works even on air
-  await expect(heading(page, 'CH 09 · Sky Watch')).toBeVisible();
+  await expect(led(page)).toHaveText('09');
 
   await visit(page, '12:00', '/?rerun=04');
-  await expect(heading(page, 'CH 04 · Hypnosis Test Pattern')).toBeVisible();
+  await expect(led(page)).toHaveText('04');
 
   await page.locator('.guide-item[data-ch="03"]').click();
-  await expect(heading(page, 'CH 03 · Emergency Alert')).toBeVisible();
+  await expect(led(page)).toHaveText('03');
   await page.locator('.guide-item[data-ch="so"]').click(); // the 04:43 row too
-  await expect(heading(page, /SIGN-OFF · Luna Pie/)).toBeVisible();
+  await expect(led(page)).toHaveText('SO');
   await expect(page).toHaveURL(/\?rerun=so$/);
 });
 
@@ -75,14 +84,14 @@ test('rerun clock: the sign-off tape ejects after 60 s, and real time does not m
 }) => {
   await visit(page, '12:00', '/?rerun=so');
   await page.clock.fastForward(59_000);
-  await expect(heading(page, /SIGN-OFF · Luna Pie/)).toBeVisible();
+  await expect(led(page)).toHaveText('SO');
   await page.clock.fastForward(2000);
-  await expect(heading(page, 'OFF AIR')).toBeVisible();
+  await expect(page.locator('.test-card')).toBeVisible();
   await expect(page).not.toHaveURL(/rerun/);
 
   await visit(page, '04:42', '/?rerun=09');
   await page.clock.fastForward(120_000); // the real clock passes 04:44
-  await expect(heading(page, 'CH 09 · Sky Watch')).toBeVisible();
+  await expect(led(page)).toHaveText('09');
   await expect(page.locator('.rerun-clock')).toHaveText('04:20 AM');
 });
 

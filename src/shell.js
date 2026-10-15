@@ -123,13 +123,15 @@ export function mountShell(root) {
   );
 
   const controls = {
-    up: control('up', copy.tv.chUp, copy.tv.chUpSr),
-    down: control('down', copy.tv.chDown, copy.tv.chDownSr),
+    up: control('up', copy.tv.chUp, copy.tv.chUpSr, { 'data-ctl': 'up' }),
+    down: control('down', copy.tv.chDown, copy.tv.chDownSr, { 'data-ctl': 'down' }),
     motion: control('pause', copy.tv.motion, copy.tv.motion, {
       'aria-pressed': 'false',
+      'data-ctl': 'motion',
     }),
     power: control('power', copy.tv.power, copy.tv.power, {
       'aria-pressed': 'true',
+      'data-ctl': 'power',
     }),
   };
 
