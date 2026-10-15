@@ -6,3 +6,6 @@ test-results
 .textlint-cache
 build/
 .vitest
+
+# Local Claude Code state, not project files
+.claude/

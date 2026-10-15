@@ -1,0 +1,13 @@
+{
+  "ch": "03",
+  "title": "Emergency Alert",
+  "channel": "CH {ch}",
+  "kanji": "警報",
+  "alert": "ALERT",
+  "banner": "緊急放送 · EMERGENCY BROADCAST FROM THE OTHER SIDE",
+  "transcript": "Residents of all planes: if you hear your name called three times tonight, do not answer.",
+  "ticker": "MIRRORS COVERED UNTIL 4:44 AM · IF THE STATIC SHOWS A FACE, DO NOT LOOK",
+  "tickerLabel": "On the ticker:",
+  "baybayin": "ᜊᜊᜎ",
+  "baybayinLabel": "Babala, warning"
+}

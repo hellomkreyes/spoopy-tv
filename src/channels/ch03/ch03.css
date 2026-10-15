@@ -1,0 +1,170 @@
+/* CH 03 · Emergency Alert. Colours from docs/mocks/ch03-emergency-alert-hybrid.png. */
+.ch03 {
+  --ch03-navy: #0b0a24;
+  --ch03-blue: #3b5cff;
+  --ch03-pink: #ff8fe6;
+  --ch03-bar: #e22bb8;
+  overflow: hidden;
+  padding-top: 0;
+  background:
+    radial-gradient(circle, rgba(226, 43, 184, 0.35) 1px, transparent 1.5px) 0 0 /
+      6px 6px,
+    var(--ch03-navy);
+}
+
+.ch03 .view-title {
+  margin: 0;
+  padding: 10px 14px;
+  font-family: var(--label);
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  text-align: right;
+  color: #fff;
+  background: #7a0f66;
+  text-shadow: none;
+}
+
+.ch03-stage {
+  position: absolute;
+  inset: 52px 0 40% 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4%;
+}
+
+.ch03-sign {
+  width: clamp(64px, 20vw, 130px);
+  height: auto;
+  transform-origin: 50% 50%;
+}
+
+.ch03-sign-shape {
+  fill: var(--ch03-navy);
+  stroke: var(--ch03-blue);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.ch03-sign-bar,
+.ch03-sign-dot {
+  fill: var(--ch03-bar);
+}
+
+.ch03-kanji {
+  display: inline-flex;
+  font-family: var(--body);
+  font-size: clamp(3.5rem, 18vw, 8rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--ch03-navy);
+  -webkit-text-stroke: 3px var(--ch03-blue);
+  text-shadow: 3px 3px 0 var(--ch03-bar);
+}
+
+.ch03-char {
+  display: inline-block;
+}
+
+.ch03-alert {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--label);
+  font-size: clamp(1.2rem, 6vw, 2.4rem);
+  letter-spacing: 0.4em;
+  color: var(--ch03-pink);
+  white-space: nowrap;
+}
+
+.ch03-letter {
+  display: inline-block;
+}
+
+/* Big decorative Baybayin word (babala), behind the stage. Decoration only. */
+.ch03-baybayin {
+  position: absolute;
+  top: 18%;
+  left: 0;
+  right: 0;
+  font-family: 'Noto Sans Tagalog', system-ui, sans-serif;
+  font-size: clamp(3rem, 16vw, 7rem);
+  line-height: 1;
+  color: rgba(59, 92, 255, 0.22);
+  pointer-events: none;
+  user-select: none;
+}
+
+.ch03-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: var(--ch03-bar);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.ch03-bar--a {
+  top: 46%;
+}
+
+.ch03-bar--b {
+  top: 52%;
+  height: 8px;
+}
+
+.ch03-box {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 52px;
+  padding: 12px 14px;
+  text-align: left;
+  background: rgba(11, 10, 36, 0.92);
+  border: 2px solid var(--ch03-blue);
+}
+
+.ch03-banner {
+  margin: 0 0 6px;
+  font-family: var(--label);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: var(--ch03-pink);
+}
+
+.ch03-body {
+  margin: 0;
+  font-family: var(--body);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ch03-ticker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 36px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  background: var(--ch03-pink);
+  color: var(--ch03-navy);
+  pointer-events: none;
+}
+
+.ch03-ticker-track {
+  display: flex;
+  width: max-content;
+  font-family: var(--label);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.ch03-ticker-track span {
+  padding-right: 3em;
+}

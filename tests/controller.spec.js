@@ -121,9 +121,10 @@ test('Space pauses everything and resumes in sync', async ({ page }) => {
 test('channels tune in at the clock position: midnight-synced on air, tape-start in a rerun', async ({
   page,
 }) => {
-  await boot(page, '03:20:03'); // 3 s into a 12 s loop
-  expect(await hook(page, 'progress')).toBeGreaterThan(0.2);
-  expect(await hook(page, 'progress')).toBeLessThan(0.4);
+  await boot(page, '03:20:03'); // ~3 s into CH 03's 8 s loop, plus load time
+  const p = await hook(page, 'progress');
+  expect(p).toBeGreaterThan(0.3);
+  expect(p).toBeLessThan(0.5);
 
   await boot(page, '12:00:06', '/?rerun=09'); // the clock is mid-loop, the tape is not
   expect(await hook(page, 'progress')).toBeLessThan(0.1);
@@ -152,11 +153,16 @@ test('50 flips leave no extra timelines or channel elements behind', async ({
   page,
 }) => {
   await boot(page);
+  // Compare on the same channel: CH 03 has more tweens than a placeholder, so
+  // ending on another channel would change the count for the wrong reason.
   const baseline = await hook(page, 'timelineCount');
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 25; i++) {
     await page.keyboard.press('ArrowUp');
     await settle(page);
+    await page.keyboard.press('ArrowDown');
+    await settle(page);
   }
+  await expect(led(page)).toHaveText('03');
   expect(await hook(page, 'timelineCount')).toBe(baseline);
   await expect(page.locator('#screen > *')).toHaveCount(1);
 });
@@ -191,7 +197,11 @@ test.describe('reduced motion', () => {
     await page.keyboard.press('ArrowUp');
     await settle(page);
     await expect(led(page)).toHaveText('04');
-    expect(await hook(page, 'progress')).toBeCloseTo(still, 5);
+    // Each channel has its own still frame, so read the new one after the flip.
+    const nextStill = await hook(page, 'stillAt');
+    expect(await hook(page, 'progress')).toBeCloseTo(nextStill, 5);
+    await page.clock.runFor(2000);
+    expect(await hook(page, 'progress')).toBeCloseTo(nextStill, 5);
     expect((await cuts(page)).every((c) => c.burst === false)).toBe(true);
     await expect(page.locator('.static-layer')).toBeHidden();
   });
